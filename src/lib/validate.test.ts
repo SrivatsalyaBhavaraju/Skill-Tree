@@ -147,6 +147,19 @@ describe('salvaging broken output', () => {
     expect(report.dropped).toHaveLength(2)
   })
 
+  it.each([
+    ['MATH', 'math', 0],
+    [' theory ', 'theory', 0],
+    ['physics', 'theory', 1],
+    [undefined, 'theory', 1],
+  ])('reads subject %j as %s', (raw, subject, fixes) => {
+    const tree = { title: 'X', subject: raw, nodes: [{ id: 'a', label: 'A', cards: [{ type: 'flashcard', front: 'Q', back: 'A' }] }] }
+    const result = success(validateTree(tree))
+
+    expect(result.tree.subject).toBe(subject)
+    expect(result.report.fixed.filter((line) => line.includes('subject'))).toHaveLength(fixes)
+  })
+
   it('turns "true" and "false" text answers into booleans', () => {
     const result = validateTree({
       title: 'X',

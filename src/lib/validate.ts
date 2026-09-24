@@ -1,4 +1,4 @@
-import { LIMITS, type CardContent, type SkillTree, type TopicNode } from './schema'
+import { LIMITS, SUBJECTS, type CardContent, type SkillTree, type Subject, type TopicNode } from './schema'
 
 export type FailureKind = 'empty' | 'malformed' | 'wrong_shape'
 
@@ -238,6 +238,16 @@ function readTopic(raw: unknown, position: number, report: RepairReport): TopicD
   }
 }
 
+function readSubject(value: unknown, report: RepairReport): Subject {
+  const subject = SUBJECTS.find((name) => name === cleanText(value)?.toLowerCase())
+  if (subject) return subject
+
+  report.fixed.push(
+    value === undefined ? 'The tree had no subject, treated it as theory' : `Unknown subject "${String(value)}", treated it as theory`,
+  )
+  return 'theory'
+}
+
 function renameDuplicateIds(topics: TopicDraft[], report: RepairReport): void {
   const seen = new Set<string>()
 
@@ -321,6 +331,8 @@ export function validateTree(data: unknown): ValidationResult {
     report.fixed.push('The tree had no title, called it "Study Tree"')
   }
 
+  const subject = readSubject(data.subject, report)
+
   const topics = data.nodes
     .map((raw, position) => readTopic(raw, position, report))
     .filter((topic): topic is TopicDraft => topic !== null)
@@ -342,7 +354,7 @@ export function validateTree(data: unknown): ValidationResult {
     cards: topic.cards.map((card, index) => ({ ...card, id: `${topic.id}#${index + 1}` })),
   }))
 
-  return { ok: true, tree: { title, nodes }, report }
+  return { ok: true, tree: { title, subject, nodes }, report }
 }
 
 export function readModelOutput(text: string): ValidationResult {

@@ -1,0 +1,51 @@
+{
+  "title": "  Photosynthesis  ",
+  "subject": "theory",
+  "nodes": [
+    {
+      "id": "chloroplast",
+      "label": "Chloroplasts",
+      "summary": "Where photosynthesis happens.",
+      "prerequisites": [],
+      "cards": [
+        { "type": "flashcard", "front": "Where does photosynthesis happen?", "back": "In the chloroplasts.", "source": "Photosynthesis happens in the chloroplasts of plant cells." },
+        { "type": "mcq", "question": "Which colours does chlorophyll mostly absorb?", "options": ["Green", "Red and blue", "Red and blue", "Ultraviolet"], "answerIndex": 1, "explanation": "Mostly red and blue.", "source": "mostly red and blue light" }
+      ]
+    },
+    {
+      "id": "light-reactions",
+      "label": "Light Reactions",
+      "summary": "Splitting water to make ATP and NADPH.",
+      "prerequisites": ["chloroplast", "thylakoid"],
+      "cards": [
+        { "type": "mcq", "question": "What is released when water is split?", "options": ["CO2", "Oxygen", "Glucose"], "answerIndex": 7, "explanation": "Oxygen.", "source": "releasing oxygen as a by-product" },
+        { "type": "truefalse", "statement": "The light reactions produce ATP and NADPH.", "answer": true, "explanation": "Both are produced in the thylakoids.", "source": "produce ATP and NADPH" }
+      ]
+    },
+    {
+      "id": "calvin-cycle",
+      "label": "Calvin Cycle",
+      "summary": "Fixing carbon dioxide into glucose.",
+      "prerequisites": ["light-reactions", "limiting-factors"],
+      "cards": [
+        { "type": "flashcard", "front": "Where does the Calvin cycle happen?", "back": "In the stroma.", "source": "The Calvin cycle takes place in the stroma." }
+      ]
+    },
+    {
+      "id": "limiting-factors",
+      "label": "Limiting Factors",
+      "summary": "What caps the rate of photosynthesis.",
+      "prerequisites": ["calvin-cycle"],
+      "cards": [
+        { "type": "truefalse", "statement": "Temperature can limit photosynthesis.", "answer": true, "explanation": "It is one of the listed limiting factors.", "source": "and temperature" }
+      ]
+    },
+    {
+      "id": "leaf-structure",
+      "label": "Leaf Structure",
+      "summary": 42,
+      "prerequisites": "chloroplast",
+      "cards": []
+    }
+  ]
+}

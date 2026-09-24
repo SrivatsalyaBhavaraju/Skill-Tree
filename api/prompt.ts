@@ -8,6 +8,7 @@ export type Prompt = {
 
 const SHAPE = `{
   "title": string,
+  "subject": "math" | "theory",
   "nodes": [
     {
       "id": string,
@@ -25,6 +26,7 @@ Card is one of:
 { "type": "truefalse", "statement": string, "answer": boolean, "explanation": string, "source": string }`
 
 const RULES = [
+  '"subject" is "math" when the material is mainly mathematics (equations, proofs, calculation), otherwise "theory".',
   `Make ${LIMITS.minTopics} to ${LIMITS.maxTopics} nodes, ordered from foundations to advanced.`,
   'Each node id is short, lowercase, hyphenated and unique. Each label is 1 to 4 words. Each summary is one sentence.',
   '"prerequisites" lists the ids of nodes that must be learned first. At least one node has none. Never create a loop.',

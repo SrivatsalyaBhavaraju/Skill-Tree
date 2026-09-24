@@ -36,8 +36,13 @@ export type TopicNode = {
   cards: Card[]
 }
 
+export const SUBJECTS = ['math', 'theory'] as const
+
+export type Subject = (typeof SUBJECTS)[number]
+
 export type SkillTree = {
   title: string
+  subject: Subject
   nodes: TopicNode[]
 }
 

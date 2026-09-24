@@ -1,0 +1,24 @@
+{
+  "title": "Photosynthesis",
+  "subject": "theory",
+  "nodes": [
+    {
+      "id": "light-reactions",
+      "label": "Light Reactions",
+      "summary": "Splitting water to make ATP and NADPH.",
+      "prerequisites": ["chloroplast"],
+      "cards": [
+        { "type": "flashcard", "front": "Where do the light reactions happen?", "back": "In the thylakoid membranes.", "source": "The light-dependent reactions take place in the thylakoid membranes." }
+      ]
+    },
+    {
+      "id": "calvin-cycle",
+      "label": "Calvin Cycle",
+      "summary": "Fixing carbon dioxide into glucose.",
+      "prerequisites": ["light-reactions", "light-reactions", "calvin-cycle"],
+      "cards": [
+        { "type": "flashcard", "front": "Where does the Calvin cycle happen?", "back": "In the stroma.", "source": "The Calvin cycle takes place in the stroma." }
+      ]
+    }
+  ]
+}

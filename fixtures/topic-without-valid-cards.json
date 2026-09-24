@@ -1,0 +1,35 @@
+{
+  "title": "Photosynthesis",
+  "subject": "theory",
+  "nodes": [
+    {
+      "id": "chloroplast",
+      "label": "Chloroplasts",
+      "summary": "Where photosynthesis happens.",
+      "prerequisites": [],
+      "cards": [
+        { "type": "flashcard", "front": "Where does photosynthesis happen?", "back": "In the chloroplasts.", "source": "Photosynthesis happens in the chloroplasts of plant cells." }
+      ]
+    },
+    {
+      "id": "light-reactions",
+      "label": "Light Reactions",
+      "summary": "Splitting water to make ATP and NADPH.",
+      "prerequisites": ["chloroplast"],
+      "cards": [
+        { "type": "flashcard", "front": "", "back": "Oxygen." },
+        { "type": "essay", "prompt": "Describe the light reactions." },
+        { "type": "truefalse", "statement": "Light reactions make glucose.", "answer": "no" }
+      ]
+    },
+    {
+      "id": "calvin-cycle",
+      "label": "Calvin Cycle",
+      "summary": "Fixing carbon dioxide into glucose.",
+      "prerequisites": ["light-reactions"],
+      "cards": [
+        { "type": "flashcard", "front": "Where does the Calvin cycle happen?", "back": "In the stroma.", "source": "The Calvin cycle takes place in the stroma." }
+      ]
+    }
+  ]
+}

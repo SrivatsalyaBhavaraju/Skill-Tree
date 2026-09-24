@@ -1,0 +1,14 @@
+{
+  "title": "Photosynthesis",
+  "subject": "theory",
+  "nodes": [
+    {
+      "id": "chloroplast",
+      "label": "Chloroplasts",
+      "summary": "Where photosynthesis happens.",
+      "prerequisites": [],
+      "cards": [
+        {
+          "type": "flashcard",
+          "front": "Where in plant cells does photosynthesis happen?",
+          "back": "In the chlorop

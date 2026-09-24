@@ -1,0 +1,44 @@
+{
+  "title": "Photosynthesis",
+  "subject": "theory",
+  "nodes": [
+    {
+      "id": "light-reactions",
+      "label": "Light Reactions",
+      "summary": "Splitting water to make ATP and NADPH.",
+      "prerequisites": [],
+      "cards": [
+        {
+          "type": "mcq",
+          "question": "What is released when water is split?",
+          "options": ["Carbon dioxide", "Glucose", "Oxygen"],
+          "answerIndex": 3,
+          "explanation": "Splitting water releases oxygen.",
+          "source": "releasing oxygen as a by-product"
+        },
+        {
+          "type": "mcq",
+          "question": "What do the light reactions produce?",
+          "options": ["ATP and NADPH", "Glucose", "ATP and NADPH", "Starch", "Oxygen and glucose"],
+          "answerIndex": 2,
+          "explanation": "They produce ATP and NADPH.",
+          "source": "produce ATP and NADPH"
+        },
+        {
+          "type": "mcq",
+          "question": "Where do the light reactions happen?",
+          "options": ["Thylakoid membranes"],
+          "answerIndex": 0,
+          "explanation": "In the thylakoid membranes.",
+          "source": "take place in the thylakoid membranes"
+        },
+        {
+          "type": "flashcard",
+          "front": "What is split in the light reactions?",
+          "back": "Water molecules.",
+          "source": "They split water molecules"
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,7 @@
+Photosynthesis happens in the chloroplasts of plant cells. Chloroplasts contain a green pigment called chlorophyll, which absorbs light energy, mostly red and blue light, and reflects green light.
+
+The light-dependent reactions take place in the thylakoid membranes. They split water molecules, releasing oxygen as a by-product, and produce ATP and NADPH.
+
+The Calvin cycle takes place in the stroma. It uses ATP and NADPH to fix carbon dioxide into glucose. The enzyme RuBisCO captures carbon dioxide in the first step of the Calvin cycle.
+
+Factors that limit the rate of photosynthesis include light intensity, carbon dioxide concentration, and temperature. Increasing one factor only helps until another factor becomes the limit.

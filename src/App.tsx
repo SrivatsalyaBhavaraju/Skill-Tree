@@ -7,7 +7,8 @@ import { pickBackground } from './lib/background'
 function App() {
   const [text, setText] = useState('')
   const { state, generate } = useGenerateTree()
-  const background = pickBackground(text)
+  const background =
+    state.status === 'success' ? pickBackground(state.input, state.tree.subject) : pickBackground(text)
 
   useEffect(() => {
     document.documentElement.dataset.bg = background

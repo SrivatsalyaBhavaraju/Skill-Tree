@@ -7,7 +7,7 @@ import type { RepairReport } from '../lib/validate'
 export type GenerateState =
   | { status: 'idle' }
   | { status: 'loading' }
-  | { status: 'success'; tree: SkillTree; report: RepairReport }
+  | { status: 'success'; input: string; tree: SkillTree; report: RepairReport }
   | { status: 'error'; kind: ErrorKind; message: string }
 
 export function useGenerateTree() {
@@ -19,7 +19,7 @@ export function useGenerateTree() {
     const result = await requestTree(text)
 
     if (result.ok) {
-      setState({ status: 'success', tree: result.tree, report: result.report })
+      setState({ status: 'success', input: text, tree: result.tree, report: result.report })
     } else {
       setState({ status: 'error', kind: result.kind, message: result.message })
     }

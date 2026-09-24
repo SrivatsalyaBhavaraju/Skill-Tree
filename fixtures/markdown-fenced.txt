@@ -1,0 +1,31 @@
+Here is your skill tree:
+
+```json
+{
+  "title": "Photosynthesis",
+  "subject": "theory",
+  "nodes": [
+    {
+      "id": "chloroplast",
+      "label": "Chloroplasts",
+      "summary": "Where photosynthesis happens.",
+      "prerequisites": [],
+      "cards": [
+        {
+          "type": "flashcard",
+          "front": "Where in plant cells does photosynthesis happen?",
+          "back": "In the chloroplasts.",
+          "source": "Photosynthesis happens in the chloroplasts of plant cells."
+        },
+        {
+          "type": "truefalse",
+          "statement": "Chlorophyll reflects green light.",
+          "answer": true,
+          "explanation": "Reflected green light is what we see.",
+          "source": "reflects green light"
+        }
+      ]
+    }
+  ]
+}
+```

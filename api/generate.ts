@@ -1,17 +1,8 @@
+import type { ErrorKind } from '../src/lib/errors'
 import { checkInput } from '../src/lib/input'
 import { readModelOutput } from '../src/lib/validate'
 import { callGemini } from './gemini'
 import { buildPrompt } from './prompt'
-
-export type ErrorKind =
-  | 'bad_input'
-  | 'config'
-  | 'network'
-  | 'rate_limit'
-  | 'upstream'
-  | 'empty'
-  | 'malformed'
-  | 'wrong_shape'
 
 const STATUS: Record<ErrorKind, number> = {
   bad_input: 400,
@@ -22,6 +13,7 @@ const STATUS: Record<ErrorKind, number> = {
   empty: 502,
   malformed: 502,
   wrong_shape: 502,
+  server: 500,
 }
 
 function errorResponse(kind: ErrorKind, message: string): Response {

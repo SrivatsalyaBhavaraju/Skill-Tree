@@ -1,0 +1,109 @@
+{
+  "title": "Photosynthesis",
+  "subject": "theory",
+  "nodes": [
+    {
+      "id": "chloroplast",
+      "label": "Chloroplasts",
+      "summary": "Where photosynthesis happens and how chlorophyll captures light.",
+      "prerequisites": [],
+      "cards": [
+        {
+          "type": "flashcard",
+          "front": "Where in plant cells does photosynthesis happen?",
+          "back": "In the chloroplasts.",
+          "source": "Photosynthesis happens in the chloroplasts of plant cells."
+        },
+        {
+          "type": "mcq",
+          "question": "Which colours of light does chlorophyll mostly absorb?",
+          "options": ["Green and yellow", "Red and blue", "Only ultraviolet", "Infrared"],
+          "answerIndex": 1,
+          "explanation": "Chlorophyll absorbs mostly red and blue light and reflects green, which is why leaves look green.",
+          "source": "absorbs light energy, mostly red and blue light, and reflects green light"
+        },
+        {
+          "type": "truefalse",
+          "statement": "Chlorophyll reflects green light.",
+          "answer": true,
+          "explanation": "Reflected green light is what we see when we look at a leaf.",
+          "source": "reflects green light"
+        }
+      ]
+    },
+    {
+      "id": "light-reactions",
+      "label": "Light Reactions",
+      "summary": "Splitting water in the thylakoids to make ATP and NADPH.",
+      "prerequisites": ["chloroplast"],
+      "cards": [
+        {
+          "type": "flashcard",
+          "front": "Where do the light-dependent reactions take place?",
+          "back": "In the thylakoid membranes.",
+          "source": "The light-dependent reactions take place in the thylakoid membranes."
+        },
+        {
+          "type": "mcq",
+          "question": "What is released as a by-product when water is split?",
+          "options": ["Carbon dioxide", "Glucose", "Oxygen", "Nitrogen"],
+          "answerIndex": 2,
+          "explanation": "Splitting water releases oxygen, which the plant gives off.",
+          "source": "They split water molecules, releasing oxygen as a by-product"
+        },
+        {
+          "type": "truefalse",
+          "statement": "The light-dependent reactions produce glucose directly.",
+          "answer": false,
+          "explanation": "They produce ATP and NADPH; glucose is made later in the Calvin cycle.",
+          "source": "produce ATP and NADPH"
+        }
+      ]
+    },
+    {
+      "id": "calvin-cycle",
+      "label": "Calvin Cycle",
+      "summary": "Using ATP and NADPH in the stroma to fix carbon dioxide into glucose.",
+      "prerequisites": ["light-reactions"],
+      "cards": [
+        {
+          "type": "flashcard",
+          "front": "Where does the Calvin cycle take place?",
+          "back": "In the stroma.",
+          "source": "The Calvin cycle takes place in the stroma."
+        },
+        {
+          "type": "mcq",
+          "question": "Which enzyme captures carbon dioxide in the first step of the Calvin cycle?",
+          "options": ["ATP synthase", "RuBisCO", "Amylase"],
+          "answerIndex": 1,
+          "explanation": "RuBisCO fixes carbon dioxide at the start of the cycle.",
+          "source": "The enzyme RuBisCO captures carbon dioxide in the first step of the Calvin cycle."
+        }
+      ]
+    },
+    {
+      "id": "limiting-factors",
+      "label": "Limiting Factors",
+      "summary": "What caps the rate of photosynthesis.",
+      "prerequisites": ["light-reactions", "calvin-cycle"],
+      "cards": [
+        {
+          "type": "mcq",
+          "question": "Which of these is NOT listed as a limiting factor of photosynthesis?",
+          "options": ["Light intensity", "Temperature", "Soil colour", "Carbon dioxide concentration"],
+          "answerIndex": 2,
+          "explanation": "The limiting factors are light intensity, carbon dioxide concentration, and temperature.",
+          "source": "light intensity, carbon dioxide concentration, and temperature"
+        },
+        {
+          "type": "truefalse",
+          "statement": "Increasing light intensity always keeps increasing the rate of photosynthesis.",
+          "answer": false,
+          "explanation": "It only helps until another factor, like carbon dioxide or temperature, becomes the limit.",
+          "source": "Increasing one factor only helps until another factor becomes the limit."
+        }
+      ]
+    }
+  ]
+}

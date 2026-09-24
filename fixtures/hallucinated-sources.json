@@ -1,0 +1,40 @@
+{
+  "title": "Photosynthesis",
+  "subject": "theory",
+  "nodes": [
+    {
+      "id": "calvin-cycle",
+      "label": "Calvin Cycle",
+      "summary": "Fixing carbon dioxide into glucose.",
+      "prerequisites": [],
+      "cards": [
+        {
+          "type": "flashcard",
+          "front": "Where does the Calvin cycle take place?",
+          "back": "In the stroma.",
+          "source": "the calvin cycle takes place in the STROMA"
+        },
+        {
+          "type": "truefalse",
+          "statement": "The Calvin cycle needs light directly.",
+          "answer": false,
+          "explanation": "It is light-independent and can run in the dark as long as ATP and NADPH are available.",
+          "source": "The Calvin cycle is light-independent and can run in darkness."
+        },
+        {
+          "type": "mcq",
+          "question": "How many carbon dioxide molecules make one glucose?",
+          "options": ["3", "6", "12"],
+          "answerIndex": 1,
+          "explanation": "Six turns of the cycle fix six CO2 into one glucose.",
+          "source": "Six molecules of carbon dioxide are needed to make one glucose molecule."
+        },
+        {
+          "type": "flashcard",
+          "front": "What does RuBisCO do?",
+          "back": "Captures carbon dioxide in the first step of the Calvin cycle."
+        }
+      ]
+    }
+  ]
+}

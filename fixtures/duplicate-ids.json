@@ -1,0 +1,24 @@
+{
+  "title": "Photosynthesis",
+  "subject": "theory",
+  "nodes": [
+    {
+      "id": "chloroplast",
+      "label": "Chloroplasts",
+      "summary": "Where photosynthesis happens.",
+      "prerequisites": [],
+      "cards": [
+        { "type": "flashcard", "front": "Where does photosynthesis happen?", "back": "In the chloroplasts.", "source": "Photosynthesis happens in the chloroplasts of plant cells." }
+      ]
+    },
+    {
+      "id": "chloroplast",
+      "label": "Chlorophyll",
+      "summary": "The green pigment that absorbs light.",
+      "prerequisites": [],
+      "cards": [
+        { "type": "truefalse", "statement": "Chlorophyll reflects green light.", "answer": true, "explanation": "That is why leaves look green.", "source": "reflects green light" }
+      ]
+    }
+  ]
+}
