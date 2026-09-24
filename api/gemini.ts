@@ -3,7 +3,7 @@ import type { Prompt } from './prompt'
 const ENDPOINT = 'https://generativelanguage.googleapis.com/v1beta/models'
 const DEFAULT_MODEL = 'gemini-3.5-flash-lite'
 
-export type GeminiFailureKind = 'network' | 'rate_limit' | 'upstream'
+export type GeminiFailureKind = 'network' | 'rate_limit' | 'upstream' | 'timeout' | 'cancelled'
 
 export type GeminiResult =
   | { ok: true; text: string }
@@ -36,6 +36,11 @@ export async function callGemini(prompt: Prompt, apiKey: string, signal?: AbortS
       signal,
     })
   } catch {
+    if (signal?.aborted) {
+      return signal.reason instanceof DOMException && signal.reason.name === 'TimeoutError'
+        ? { ok: false, kind: 'timeout', message: 'The AI service took too long to answer.' }
+        : { ok: false, kind: 'cancelled', message: 'The request was cancelled.' }
+    }
     return { ok: false, kind: 'network', message: 'Could not reach the AI service.' }
   }
 

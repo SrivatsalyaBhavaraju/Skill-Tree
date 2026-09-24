@@ -102,6 +102,21 @@ describe('POST /api/generate', () => {
       expect(response.body.error.kind).toBe(kind)
     })
 
+    it('reports a model call that ran out of time as a timeout', async () => {
+      const request = new Request('http://localhost/api/generate', {
+        method: 'POST',
+        headers: { 'content-type': 'application/json' },
+        body: '{"text":"Photosynthesis"}',
+        signal: AbortSignal.abort(new DOMException('Timed out', 'TimeoutError')),
+      })
+      fetchMock.mockRejectedValue(new DOMException('Timed out', 'TimeoutError'))
+
+      const response = await POST(request)
+
+      expect(response.status).toBe(504)
+      expect((await response.json()).error.kind).toBe('timeout')
+    })
+
     it('reports a network failure', async () => {
       fetchMock.mockRejectedValue(new TypeError('fetch failed'))
 

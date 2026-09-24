@@ -15,7 +15,10 @@ const STATUS: Record<ErrorKind, number> = {
   wrong_shape: 502,
   server: 500,
   cancelled: 499,
+  timeout: 504,
 }
+
+const MODEL_TIMEOUT_MS = 25_000
 
 function errorResponse(kind: ErrorKind, message: string): Response {
   return Response.json({ error: { kind, message } }, { status: STATUS[kind] })
@@ -49,7 +52,8 @@ export async function POST(request: Request): Promise<Response> {
     return errorResponse('bad_input', inputProblem)
   }
 
-  const reply = await callGemini(buildPrompt(text), apiKey, request.signal)
+  const signal = AbortSignal.any([request.signal, AbortSignal.timeout(MODEL_TIMEOUT_MS)])
+  const reply = await callGemini(buildPrompt(text), apiKey, signal)
   if (!reply.ok) {
     return errorResponse(reply.kind, reply.message)
   }
