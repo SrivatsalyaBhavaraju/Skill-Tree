@@ -43,12 +43,14 @@ export function Choices({ prompt, choices, correctIndex, picked, explanation, on
         ))}
       </div>
 
-      {answered && (
-        <div className={right ? 'feedback feedback--right' : 'feedback feedback--wrong'} role="status">
-          <strong>{right ? 'Correct.' : `Not quite. The answer is “${choices[correctIndex].label}”.`}</strong>
-          {explanation && <p>{explanation}</p>}
-        </div>
-      )}
+      <div role="status">
+        {answered && (
+          <div className={right ? 'feedback feedback--right' : 'feedback feedback--wrong'}>
+            <strong>{right ? 'Correct.' : `Not quite. The answer is “${choices[correctIndex].label}”.`}</strong>
+            {explanation && <p>{explanation}</p>}
+          </div>
+        )}
+      </div>
     </div>
   )
 }

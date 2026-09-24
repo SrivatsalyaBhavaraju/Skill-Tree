@@ -73,3 +73,7 @@
     grid-column: 1 / -1;
   }
 }
+
+.error-card--crash {
+  margin-top: 3rem;
+}

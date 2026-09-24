@@ -43,11 +43,14 @@ export function Flashcard({ card, flipped, graded, onFlip, onGrade }: Props) {
         </div>
       )}
 
-      {graded !== undefined && (
-        <div className={graded ? 'feedback feedback--right' : 'feedback feedback--wrong'} role="status">
-          <strong>{graded ? 'Nice. Marked as known.' : 'Added to your mistakes to review.'}</strong>
-        </div>
-      )}
+      <div role="status">
+        {graded !== undefined && (
+          <div className={graded ? 'feedback feedback--right' : 'feedback feedback--wrong'}>
+            <strong>{graded ? 'Nice. Marked as known.' : 'Added to your mistakes to review.'}</strong>
+          </div>
+        )}
+        <span className="sr-only">{flipped && graded === undefined ? `Answer: ${card.back}` : ''}</span>
+      </div>
     </div>
   )
 }

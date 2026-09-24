@@ -26,7 +26,7 @@ export function LoadingCard({ onCancel }: Props) {
         <i />
       </div>
       <div className="loading-card__row">
-        <p className="loading-card__message">
+        <p className="loading-card__message" role="status">
           {message(seconds)}
         </p>
         <span className="loading-card__time" aria-hidden="true">

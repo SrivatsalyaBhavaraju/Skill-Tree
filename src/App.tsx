@@ -1,6 +1,8 @@
 import { useCallback, useEffect, useReducer, useState } from 'react'
 import { Backdrop } from './components/Backdrop'
+import { ErrorBoundary } from './components/ErrorBoundary'
 import { ErrorCard } from './components/ErrorCard'
+import { Examples } from './components/Examples'
 import { InputPanel } from './components/InputPanel'
 import { LoadingCard } from './components/LoadingCard'
 import { Toast, type Notice } from './components/Toast'
@@ -43,6 +45,11 @@ function App() {
     setOpened(null)
     dispatch({ type: 'reset' })
     generate(input)
+  }
+
+  function startOver() {
+    setOpened(null)
+    setEditing(true)
   }
 
   function openTopic(id: string) {
@@ -103,15 +110,17 @@ function App() {
         </header>
 
         {tree ? (
-          <TreeView
-            key={tree.tree.title + tree.input}
-            tree={tree.tree}
-            progress={progress}
-            paused={deck !== null}
-            fromNotes={isNotes(tree.input)}
-            onOpenTopic={openTopic}
-            onReview={openReview}
-          />
+          <ErrorBoundary onReset={startOver}>
+            <TreeView
+              key={tree.tree.title + tree.input}
+              tree={tree.tree}
+              progress={progress}
+              paused={deck !== null}
+              fromNotes={isNotes(tree.input)}
+              onOpenTopic={openTopic}
+              onReview={openReview}
+            />
+          </ErrorBoundary>
         ) : (
           <>
             <section className="app__hero">
@@ -125,7 +134,9 @@ function App() {
               <InputPanel value={text} onChange={setText} onSubmit={() => build(text)} busy={state.status === 'loading'} />
             </div>
 
-            <section className="app__result" aria-live="polite">
+            {state.status === 'idle' && text.trim() === '' && <Examples onPick={setText} />}
+
+            <section className="app__result">
               {state.status === 'loading' && <LoadingCard onCancel={cancel} />}
 
               {state.status === 'error' && (
@@ -142,7 +153,11 @@ function App() {
         )}
       </main>
 
-      {deck && <TopicPanel key={deck.id} deck={deck} progress={progress} onAnswer={answer} onClose={() => setOpened(null)} />}
+      {deck && (
+        <ErrorBoundary onReset={startOver}>
+          <TopicPanel key={deck.id} deck={deck} progress={progress} onAnswer={answer} onClose={() => setOpened(null)} />
+        </ErrorBoundary>
+      )}
       <Toast notice={notice} onDone={clearNotice} />
     </>
   )
