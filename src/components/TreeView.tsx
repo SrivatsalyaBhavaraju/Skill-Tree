@@ -1,4 +1,5 @@
-import { useMemo, useRef } from 'react'
+import { useEffect, useMemo, useRef, useState } from 'react'
+import { celebrate, unlock } from '../lib/effects'
 import type { SkillTree } from '../lib/schema'
 import { countCards, isComplete, levelsOf, nextTopic, statusText, summarize, topicStatus, type Progress } from '../lib/tree'
 import { Connectors, type Edge } from './Connectors'
@@ -8,6 +9,7 @@ import './TreeView.css'
 type Props = {
   tree: SkillTree
   progress: Progress
+  paused: boolean
   fromNotes: boolean
   onOpenTopic: (id: string) => void
   onReview: () => void
@@ -17,9 +19,34 @@ function levelName(index: number): string {
   return index === 0 ? 'Start' : `Level ${index + 1}`
 }
 
-export function TreeView({ tree, progress, fromNotes, onOpenTopic, onReview }: Props) {
+export function TreeView({ tree, progress: latest, paused, fromNotes, onOpenTopic, onReview }: Props) {
   const board = useRef<HTMLElement>(null)
   const tiles = useRef(new Map<string, HTMLElement>())
+  const [progress, setProgress] = useState(latest)
+  if (!paused && progress !== latest) setProgress(latest)
+
+  const statuses = useMemo(
+    () => new Map(tree.nodes.map((node) => [node.id, topicStatus(node, tree.nodes, progress)])),
+    [tree.nodes, progress],
+  )
+  const previous = useRef(statuses)
+
+  useEffect(() => {
+    const before = previous.current
+    previous.current = statuses
+    if (before === statuses) return
+
+    const timers: number[] = []
+    for (const [id, status] of statuses) {
+      const tile = tiles.current.get(id)
+      const was = before.get(id)
+      if (!tile || was === status) continue
+
+      if (status === 'done') celebrate(tile)
+      else if (was === 'locked') timers.push(window.setTimeout(() => unlock(tile), 700))
+    }
+    return () => timers.forEach((timer) => window.clearTimeout(timer))
+  }, [statuses])
 
   const levels = useMemo(() => levelsOf(tree.nodes), [tree.nodes])
   const summary = summarize(tree.nodes, progress)
@@ -33,11 +60,11 @@ export function TreeView({ tree, progress, fromNotes, onOpenTopic, onReview }: P
           const lit =
             prerequisite !== undefined &&
             isComplete(prerequisite, progress) &&
-            topicStatus(node, tree.nodes, progress) !== 'locked'
+            statuses.get(node.id) !== 'locked'
           return { from: id, to: node.id, lit }
         }),
       ),
-    [tree.nodes, progress],
+    [tree.nodes, progress, statuses],
   )
 
   let order = 0
@@ -99,7 +126,7 @@ export function TreeView({ tree, progress, fromNotes, onOpenTopic, onReview }: P
                   <TopicTile
                     key={node.id}
                     node={node}
-                    status={topicStatus(node, tree.nodes, progress)}
+                    status={statuses.get(node.id) ?? 'locked'}
                     text={statusText(node, tree.nodes, progress)}
                     correct={counts.correct}
                     missed={counts.missed}

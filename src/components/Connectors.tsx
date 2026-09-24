@@ -1,4 +1,5 @@
-import { useLayoutEffect, useState, type RefObject } from 'react'
+import { useEffect, useLayoutEffect, useRef, useState, type RefObject } from 'react'
+import { prefersCalm } from '../lib/effects'
 
 export type Edge = {
   from: string
@@ -30,6 +31,30 @@ function position(element: HTMLElement, board: HTMLElement) {
 
 export function Connectors({ edges, board, tiles }: Props) {
   const [paths, setPaths] = useState<Path[]>([])
+  const svg = useRef<SVGSVGElement>(null)
+  const litBefore = useRef<Set<string> | null>(null)
+
+  useEffect(() => {
+    if (paths.length === 0) return
+    const lit = new Set(paths.filter((path) => path.lit).map((path) => path.key))
+    const before = litBefore.current
+    litBefore.current = lit
+    if (!before || prefersCalm()) return
+
+    for (const key of lit) {
+      if (before.has(key)) continue
+      const element = svg.current?.querySelector<SVGPathElement>(`[data-key="${CSS.escape(key)}"]`)
+      if (!element) continue
+      const length = element.getTotalLength()
+      element.animate(
+        [
+          { strokeDasharray: `${length}`, strokeDashoffset: `${length}` },
+          { strokeDasharray: `${length}`, strokeDashoffset: '0' },
+        ],
+        { duration: 1000, delay: 500, easing: 'cubic-bezier(0.16, 1, 0.3, 1)', fill: 'backwards' },
+      )
+    }
+  }, [paths])
 
   useLayoutEffect(() => {
     const container = board.current
@@ -69,10 +94,10 @@ export function Connectors({ edges, board, tiles }: Props) {
   }, [edges, board, tiles])
 
   return (
-    <svg className="connectors" aria-hidden="true">
+    <svg ref={svg} className="connectors" aria-hidden="true">
       {paths.map((path, index) => (
         <g key={path.key}>
-          <path className={path.lit ? 'connector connector--lit' : 'connector'} d={path.d} />
+          <path data-key={path.key} className={path.lit ? 'connector connector--lit' : 'connector'} d={path.d} />
           {path.lit && (
             <circle className="connector__pulse" r="2.5">
               <animateMotion

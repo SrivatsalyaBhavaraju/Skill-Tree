@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState } from 'react'
+import { useCallback, useEffect, useReducer, useState } from 'react'
 import { Backdrop } from './components/Backdrop'
 import { InputPanel } from './components/InputPanel'
 import { Toast, type Notice } from './components/Toast'
@@ -7,15 +7,15 @@ import { TreeView } from './components/TreeView'
 import { useGenerateTree } from './hooks/useGenerateTree'
 import { pickBackground } from './lib/background'
 import { isNotes } from './lib/input'
-import { statusText, topicStatus, type Progress } from './lib/tree'
-
-const NO_PROGRESS: Progress = {}
+import { progressReducer } from './lib/progress'
+import { isComplete, statusText, topicStatus } from './lib/tree'
 
 function App() {
   const [text, setText] = useState('')
   const [editing, setEditing] = useState(true)
   const [openId, setOpenId] = useState<string | null>(null)
   const [notice, setNotice] = useState<Notice | null>(null)
+  const [progress, dispatch] = useReducer(progressReducer, {})
   const { state, generate } = useGenerateTree()
 
   const tree = state.status === 'success' && !editing ? state : null
@@ -31,6 +31,7 @@ function App() {
   function build() {
     setEditing(false)
     setOpenId(null)
+    dispatch({ type: 'reset' })
     generate(text)
   }
 
@@ -40,11 +41,27 @@ function App() {
     const node = nodes.find((item) => item.id === id)
     if (!node) return
 
-    if (topicStatus(node, nodes, NO_PROGRESS) === 'locked') {
-      setNotice({ id: Date.now(), text: `${node.label}: ${statusText(node, nodes, NO_PROGRESS)}` })
+    if (topicStatus(node, nodes, progress) === 'locked') {
+      setNotice({ id: Date.now(), text: `${node.label}: ${statusText(node, nodes, progress)}` })
     } else {
       setOpenId(id)
     }
+  }
+
+  function answer(cardId: string, correct: boolean) {
+    if (!tree) return
+    const nodes = tree.tree.nodes
+    const next = progressReducer(progress, { type: 'answer', cardId, correct })
+    dispatch({ type: 'answer', cardId, correct })
+
+    const finished = nodes.find((node) => !isComplete(node, progress) && isComplete(node, next))
+    if (!finished) return
+
+    const unlocked = nodes.filter(
+      (node) => topicStatus(node, nodes, progress) === 'locked' && topicStatus(node, nodes, next) !== 'locked',
+    )
+    const extra = unlocked.length > 0 ? ` Unlocked: ${unlocked.map((node) => node.label).join(', ')}.` : ''
+    setNotice({ id: Date.now(), text: `${finished.label} complete.${extra}` })
   }
 
   return (
@@ -73,7 +90,8 @@ function App() {
           <TreeView
             key={tree.tree.title + tree.input}
             tree={tree.tree}
-            progress={NO_PROGRESS}
+            progress={progress}
+            paused={openNode !== null}
             fromNotes={isNotes(tree.input)}
             onOpenTopic={openTopic}
             onReview={() => {}}
@@ -113,7 +131,9 @@ function App() {
         )}
       </main>
 
-      {openNode && <TopicPanel key={openNode.id} node={openNode} onClose={() => setOpenId(null)} />}
+      {openNode && (
+        <TopicPanel key={openNode.id} node={openNode} progress={progress} onAnswer={answer} onClose={() => setOpenId(null)} />
+      )}
       <Toast notice={notice} onDone={clearNotice} />
     </>
   )

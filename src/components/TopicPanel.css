@@ -106,10 +106,6 @@
   transition: background-color 0.4s;
 }
 
-.panel__dot--current {
-  background: var(--text);
-}
-
 .panel__stage {
   flex: 1;
   display: flex;
@@ -200,19 +196,170 @@
   line-height: 1.3;
 }
 
-.question__options {
+.question__choices {
   display: grid;
-  gap: 0.5rem;
-  margin: 1.25rem 0 0;
-  padding: 0;
-  list-style: none;
+  gap: 0.55rem;
+  margin-top: 1.25rem;
 }
 
-.question__options li {
-  padding: 0.75rem 0.9rem;
-  border: 1px solid var(--hair);
+.choice {
+  display: flex;
+  align-items: center;
+  gap: 0.8rem;
+  width: 100%;
+  min-height: 52px;
+  padding: 0.7rem 0.9rem;
+  text-align: left;
+  background: transparent;
+  border: 1px solid var(--hair-strong);
   border-radius: 12px;
+  cursor: pointer;
+  transition:
+    border-color 0.3s,
+    background-color 0.3s,
+    opacity 0.3s,
+    transform 0.4s var(--ease);
+}
+
+.choice:hover:not(:disabled) {
+  border-color: var(--text);
+  transform: translateX(3px);
+}
+
+.choice:disabled {
+  cursor: default;
+}
+
+.choice__key {
+  display: grid;
+  flex: none;
+  place-items: center;
+  width: 26px;
+  height: 26px;
+  font-family: inherit;
+  font-size: 0.78rem;
+  font-weight: 600;
   color: var(--muted);
+  border: 1px solid var(--hair-strong);
+  border-radius: 7px;
+}
+
+.choice__label {
+  font-size: 0.98rem;
+  line-height: 1.35;
+}
+
+.choice--correct {
+  background: color-mix(in srgb, var(--done) 16%, transparent);
+  border-color: var(--done);
+  animation: choice-pop 0.5s var(--ease);
+}
+
+.choice--correct .choice__key {
+  color: var(--bg);
+  background: var(--done);
+  border-color: var(--done);
+}
+
+.choice--wrong {
+  background: color-mix(in srgb, var(--review) 14%, transparent);
+  border-color: var(--review);
+  animation: choice-shake 0.45s var(--ease);
+}
+
+.choice--wrong .choice__key {
+  color: var(--bg);
+  background: var(--review);
+  border-color: var(--review);
+}
+
+.choice--faded {
+  opacity: 0.45;
+}
+
+.grade {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.55rem;
+  margin-top: 0.9rem;
+  animation: stage-in 0.5s var(--ease) both;
+}
+
+.choice--grade-missed:hover {
+  border-color: var(--review);
+}
+
+.choice--grade-got:hover {
+  border-color: var(--done);
+}
+
+.feedback {
+  margin-top: 1rem;
+  padding: 0.85rem 1rem;
+  border-left: 3px solid;
+  border-radius: 4px 12px 12px 4px;
+  animation: stage-in 0.5s var(--ease) both;
+}
+
+.feedback strong {
+  font-weight: 600;
+}
+
+.feedback p {
+  margin: 0.35rem 0 0;
+  font-size: 0.92rem;
+  color: var(--muted);
+}
+
+.feedback--right {
+  background: color-mix(in srgb, var(--done) 10%, transparent);
+  border-color: var(--done);
+}
+
+.feedback--right strong {
+  color: var(--done);
+}
+
+.feedback--wrong {
+  background: color-mix(in srgb, var(--review) 10%, transparent);
+  border-color: var(--review);
+}
+
+.feedback--wrong strong {
+  color: var(--review);
+}
+
+.flashcard-wrap {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+}
+
+.panel__dot--correct {
+  background: var(--done);
+}
+
+.panel__dot--missed {
+  background: var(--review);
+}
+
+.panel__dot--current {
+  box-shadow: 0 0 0 1px var(--text);
+}
+
+@keyframes choice-pop {
+  50% {
+    transform: scale(1.02);
+  }
+}
+
+@keyframes choice-shake {
+  25% {
+    transform: translateX(-5px);
+  }
+  60% {
+    transform: translateX(4px);
+  }
 }
 
 .panel__foot {
