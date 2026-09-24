@@ -1,0 +1,75 @@
+.error-card {
+  display: grid;
+  grid-template-columns: auto 1fr auto;
+  align-items: start;
+  gap: 1rem;
+  padding: 1.1rem 1.2rem;
+  background: var(--surface);
+  border: 1px solid color-mix(in srgb, var(--danger) 55%, transparent);
+  border-radius: var(--radius);
+  backdrop-filter: blur(12px);
+  animation: reveal 0.8s var(--ease) both;
+}
+
+.error-card__icon {
+  display: grid;
+  place-items: center;
+  width: 36px;
+  height: 36px;
+  color: var(--danger);
+  background: color-mix(in srgb, var(--danger) 16%, transparent);
+  border-radius: 50%;
+}
+
+.error-card__icon svg {
+  width: 20px;
+  height: 20px;
+}
+
+.error-card__title {
+  margin: 0.1rem 0 0;
+  font-family: var(--font-display);
+  font-size: 1.15rem;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+}
+
+.error-card__hint {
+  margin: 0.2rem 0 0;
+  color: var(--muted);
+}
+
+.error-card__details {
+  margin-top: 0.7rem;
+  font-size: 0.8rem;
+  color: var(--faint);
+}
+
+.error-card__details summary {
+  cursor: pointer;
+}
+
+.error-card__details summary:hover {
+  color: var(--muted);
+}
+
+.error-card__details code {
+  display: block;
+  margin-top: 0.4rem;
+  padding: 0.5rem 0.65rem;
+  font-size: 0.78rem;
+  word-break: break-word;
+  color: var(--muted);
+  background: var(--hair);
+  border-radius: 8px;
+}
+
+@media (max-width: 560px) {
+  .error-card {
+    grid-template-columns: auto 1fr;
+  }
+
+  .error-card__retry {
+    grid-column: 1 / -1;
+  }
+}

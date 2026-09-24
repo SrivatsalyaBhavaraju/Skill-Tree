@@ -9,6 +9,7 @@ const STATUS: Record<ErrorKind, number> = {
   config: 500,
   network: 502,
   rate_limit: 429,
+  busy: 503,
   upstream: 502,
   empty: 502,
   malformed: 502,

@@ -145,10 +145,6 @@ textarea {
   margin-top: 2.5rem;
 }
 
-.app__error {
-  color: var(--danger);
-}
-
 .btn {
   display: inline-flex;
   align-items: center;

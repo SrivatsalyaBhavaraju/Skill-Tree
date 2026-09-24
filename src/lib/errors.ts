@@ -3,6 +3,7 @@ export const ERROR_KINDS = [
   'config',
   'network',
   'rate_limit',
+  'busy',
   'upstream',
   'empty',
   'malformed',

@@ -29,6 +29,7 @@ describe('POST /api/generate', () => {
   })
 
   afterEach(() => {
+    vi.useRealTimers()
     vi.unstubAllGlobals()
     if (originalKey === undefined) {
       delete process.env.GEMINI_API_KEY
@@ -90,16 +91,35 @@ describe('POST /api/generate', () => {
     })
 
     it.each([
-      [429, 'rate_limit', 429],
-      [500, 'upstream', 502],
-      [503, 'upstream', 502],
-    ])('maps a %i from the model to %s', async (modelStatus, kind, status) => {
-      fetchMock.mockResolvedValue(new Response('{}', { status: modelStatus }))
+      [429, 'rate_limit', 429, 2],
+      [503, 'busy', 503, 2],
+      [500, 'upstream', 502, 1],
+    ])('maps a %i from the model to %s', async (modelStatus, kind, status, calls) => {
+      vi.useFakeTimers()
+      fetchMock.mockImplementation(async () => new Response('{}', { status: modelStatus }))
 
-      const response = await send('{"text":"Photosynthesis"}')
+      const pending = send('{"text":"Photosynthesis"}')
+      await vi.advanceTimersByTimeAsync(2000)
+      const response = await pending
 
       expect(response.status).toBe(status)
       expect(response.body.error.kind).toBe(kind)
+      expect(fetchMock).toHaveBeenCalledTimes(calls)
+    })
+
+    it('retries once when the model is busy, and succeeds', async () => {
+      vi.useFakeTimers()
+      fetchMock
+        .mockResolvedValueOnce(new Response('{}', { status: 503 }))
+        .mockResolvedValueOnce(geminiReply(fixture('valid-tree.json')))
+
+      const pending = send('{"text":"Photosynthesis"}')
+      await vi.advanceTimersByTimeAsync(2000)
+      const { status, body } = await pending
+
+      expect(status).toBe(200)
+      expect(body.tree.nodes).toHaveLength(4)
+      expect(fetchMock).toHaveBeenCalledTimes(2)
     })
 
     it('reports a model call that ran out of time as a timeout', async () => {

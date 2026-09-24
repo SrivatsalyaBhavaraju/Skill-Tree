@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useReducer, useState } from 'react'
 import { Backdrop } from './components/Backdrop'
+import { ErrorCard } from './components/ErrorCard'
 import { InputPanel } from './components/InputPanel'
 import { LoadingCard } from './components/LoadingCard'
 import { Toast, type Notice } from './components/Toast'
@@ -128,12 +129,7 @@ function App() {
               {state.status === 'loading' && <LoadingCard onCancel={cancel} />}
 
               {state.status === 'error' && (
-                <p className="app__error">
-                  {state.message}{' '}
-                  <button type="button" className="btn" onClick={() => build(state.input)}>
-                    Try again
-                  </button>
-                </p>
+                <ErrorCard kind={state.kind} message={state.message} onRetry={() => build(state.input)} />
               )}
 
               {state.status === 'success' && editing && (
