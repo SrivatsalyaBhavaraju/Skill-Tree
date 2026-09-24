@@ -1,5 +1,5 @@
 import type { Card, TopicNode } from './schema'
-import type { Progress } from './tree'
+import { isMiss, type Progress } from './tree'
 
 export type Deck = {
   id: string
@@ -22,7 +22,9 @@ export function topicDeck(node: TopicNode): Deck {
 }
 
 export function missedCardIds(nodes: TopicNode[], progress: Progress): string[] {
-  return nodes.flatMap((node) => node.cards.filter((card) => progress[card.id] === 'missed').map((card) => card.id))
+  const missed = nodes.flatMap((node) => node.cards.filter((card) => isMiss(progress[card.id])).map((card) => card.id))
+  const confident = missed.filter((id) => progress[id] === 'confident_miss')
+  return [...confident, ...missed.filter((id) => progress[id] !== 'confident_miss')]
 }
 
 export function reviewDeck(nodes: TopicNode[], cardIds: string[]): Deck {
@@ -34,7 +36,7 @@ export function reviewDeck(nodes: TopicNode[], cardIds: string[]): Deck {
     id: `review:${cardIds.join(',')}`,
     title: 'Review mistakes',
     summary: 'Every card you missed, from every topic. Get one right and it leaves the list.',
-    cards: entries.map((entry) => entry.card),
+    cards: cardIds.flatMap((id) => entries.find((entry) => entry.card.id === id)?.card ?? []),
     topicOf: Object.fromEntries(entries.map((entry) => [entry.card.id, entry.topic])),
     review: true,
   }

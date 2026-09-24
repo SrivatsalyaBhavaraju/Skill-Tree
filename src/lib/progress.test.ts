@@ -50,6 +50,26 @@ describe('progressReducer', () => {
     expect(before).toEqual({})
   })
 
+  it('records a wrong answer given with certainty as a confident miss', () => {
+    const state = progressReducer({}, { type: 'answer', cardId: 'a#1', correct: false, confidence: 'certain' })
+
+    expect(state).toEqual({ 'a#1': 'confident_miss' })
+  })
+
+  it('treats a wrong guess as an ordinary miss', () => {
+    const state = progressReducer({}, { type: 'answer', cardId: 'a#1', correct: false, confidence: 'guess' })
+
+    expect(state).toEqual({ 'a#1': 'missed' })
+  })
+
+  it('keeps a confident miss flagged until the card is answered correctly', () => {
+    const wrongAgain = progressReducer({ 'a#1': 'confident_miss' }, { type: 'answer', cardId: 'a#1', correct: false })
+    const fixed = progressReducer(wrongAgain, { type: 'answer', cardId: 'a#1', correct: true })
+
+    expect(wrongAgain).toEqual({ 'a#1': 'confident_miss' })
+    expect(fixed).toEqual({ 'a#1': 'correct' })
+  })
+
   it('resets to no progress', () => {
     expect(progressReducer({ 'a#1': 'correct' }, { type: 'reset' })).toEqual({})
   })

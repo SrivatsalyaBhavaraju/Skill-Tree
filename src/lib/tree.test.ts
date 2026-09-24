@@ -81,6 +81,7 @@ describe('statusText', () => {
     [{}, 'Start · 3 cards'],
     [{ 'a#1': 'correct' }, 'In progress · 2 left'],
     [{ 'a#1': 'missed' }, 'Review 1 missed card'],
+    [{ 'a#1': 'confident_miss', 'a#2': 'missed' }, 'Review 2 missed cards · 1 you were sure of'],
     [allCorrect(a), 'Completed · 3 cards'],
   ] as [Progress, string][])('describes topic a with %j as "%s"', (progress, text) => {
     expect(statusText(a, nodes, progress)).toBe(text)

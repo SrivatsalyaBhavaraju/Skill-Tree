@@ -29,6 +29,13 @@ describe('decks', () => {
     expect(missedCardIds(nodes, progress)).toEqual(['a#2', 'b#2'])
   })
 
+  it('puts confidently wrong cards first', () => {
+    const progress = { 'a#1': 'missed', 'b#3': 'confident_miss', 'a#2': 'missed' } as const
+
+    expect(missedCardIds(nodes, progress)).toEqual(['b#3', 'a#1', 'a#2'])
+    expect(reviewDeck(nodes, missedCardIds(nodes, progress)).cards.map((card) => card.id)).toEqual(['b#3', 'a#1', 'a#2'])
+  })
+
   it('builds a review deck that remembers which topic each card is from', () => {
     const deck = reviewDeck(nodes, ['a#2', 'b#2'])
 

@@ -3,7 +3,11 @@ import type { Progress } from './tree'
 
 export type Answer = number | boolean
 
-export type ProgressAction = { type: 'answer'; cardId: string; correct: boolean } | { type: 'reset' }
+export type Confidence = 'guess' | 'fair' | 'certain'
+
+export type ProgressAction =
+  | { type: 'answer'; cardId: string; correct: boolean; confidence?: Confidence }
+  | { type: 'reset' }
 
 export function isCorrect(card: Card, answer: Answer): boolean {
   switch (card.type) {
@@ -18,9 +22,13 @@ export function isCorrect(card: Card, answer: Answer): boolean {
 
 export function progressReducer(state: Progress, action: ProgressAction): Progress {
   switch (action.type) {
-    case 'answer':
-      if (state[action.cardId] === 'correct') return state
-      return { ...state, [action.cardId]: action.correct ? 'correct' : 'missed' }
+    case 'answer': {
+      const previous = state[action.cardId]
+      if (previous === 'correct') return state
+      if (action.correct) return { ...state, [action.cardId]: 'correct' }
+      const confident = action.confidence === 'certain' || previous === 'confident_miss'
+      return { ...state, [action.cardId]: confident ? 'confident_miss' : 'missed' }
+    }
     case 'reset':
       return {}
   }

@@ -1,6 +1,10 @@
 import type { TopicNode } from './schema'
 
-export type CardResult = 'correct' | 'missed'
+export type CardResult = 'correct' | 'missed' | 'confident_miss'
+
+export function isMiss(result: CardResult | undefined): boolean {
+  return result === 'missed' || result === 'confident_miss'
+}
 
 export type Progress = Record<string, CardResult>
 
@@ -33,8 +37,9 @@ export function levelsOf(nodes: TopicNode[]): TopicNode[][] {
 
 export function countCards(node: TopicNode, progress: Progress) {
   const correct = node.cards.filter((card) => progress[card.id] === 'correct').length
-  const missed = node.cards.filter((card) => progress[card.id] === 'missed').length
-  return { total: node.cards.length, correct, missed, left: node.cards.length - correct }
+  const missed = node.cards.filter((card) => isMiss(progress[card.id])).length
+  const confident = node.cards.filter((card) => progress[card.id] === 'confident_miss').length
+  return { total: node.cards.length, correct, missed, confident, left: node.cards.length - correct }
 }
 
 export function isComplete(node: TopicNode, progress: Progress): boolean {
@@ -54,13 +59,13 @@ export function topicStatus(node: TopicNode, nodes: TopicNode[], progress: Progr
 
 export function statusText(node: TopicNode, nodes: TopicNode[], progress: Progress): string {
   const status = topicStatus(node, nodes, progress)
-  const { total, correct, missed, left } = countCards(node, progress)
+  const { total, correct, missed, confident, left } = countCards(node, progress)
 
   switch (status) {
     case 'done':
       return `Completed · ${total} cards`
     case 'review':
-      return `Review ${missed} missed card${missed === 1 ? '' : 's'}`
+      return `Review ${missed} missed card${missed === 1 ? '' : 's'}${confident > 0 ? ` · ${confident} you were sure of` : ''}`
     case 'ready':
       return correct === 0 ? `Start · ${total} cards` : `In progress · ${left} left`
     case 'locked': {

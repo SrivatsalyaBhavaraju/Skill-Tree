@@ -15,7 +15,7 @@ import type { ChaosScenario } from './lib/chaos'
 import { missedCardIds, reviewDeck, topicDeck } from './lib/deck'
 import { checkGrounding } from './lib/grounding'
 import { isNotes } from './lib/input'
-import { progressReducer } from './lib/progress'
+import { progressReducer, type Confidence } from './lib/progress'
 import { isComplete, statusText, topicStatus } from './lib/tree'
 
 const CHAOS_ENABLED = new URLSearchParams(window.location.search).has('chaos')
@@ -78,11 +78,12 @@ function App() {
     if (ids.length > 0) setOpened({ review: ids })
   }
 
-  function answer(cardId: string, correct: boolean) {
+  function answer(cardId: string, correct: boolean, confidence: Confidence | undefined) {
     if (!tree) return
     const nodes = tree.tree.nodes
-    const next = progressReducer(progress, { type: 'answer', cardId, correct })
-    dispatch({ type: 'answer', cardId, correct })
+    const action = { type: 'answer', cardId, correct, confidence } as const
+    const next = progressReducer(progress, action)
+    dispatch(action)
 
     const finished = nodes.find((node) => !isComplete(node, progress) && isComplete(node, next))
     if (!finished) return

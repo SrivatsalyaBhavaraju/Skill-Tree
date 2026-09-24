@@ -522,3 +522,75 @@
   font-size: 0.82rem;
   color: var(--muted);
 }
+
+.confidence {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.5rem 0.75rem;
+  margin-bottom: 0.9rem;
+  animation: stage-in 0.5s var(--ease) both;
+}
+
+.confidence__label {
+  font-size: 0.82rem;
+  color: var(--muted);
+}
+
+.confidence__options {
+  display: flex;
+  gap: 0.35rem;
+}
+
+.confidence__option {
+  padding: 0.3rem 0.7rem;
+  font-size: 0.82rem;
+  font-weight: 500;
+  background: transparent;
+  border: 1px solid var(--hair-strong);
+  border-radius: 99px;
+  cursor: pointer;
+  transition:
+    border-color 0.3s,
+    background-color 0.3s;
+}
+
+.confidence__option:hover {
+  border-color: var(--text);
+}
+
+.confidence__option.is-on {
+  color: var(--bg);
+  background: var(--text);
+  border-color: var(--text);
+}
+
+.confidence__option--certain.is-on {
+  background: var(--ready);
+  border-color: var(--ready);
+}
+
+.confident-miss {
+  margin: 0.9rem 0 0;
+  padding: 0.75rem 0.9rem;
+  font-size: 0.88rem;
+  color: var(--text);
+  background: color-mix(in srgb, var(--danger) 12%, transparent);
+  border: 1px solid color-mix(in srgb, var(--danger) 55%, transparent);
+  border-radius: 12px;
+  animation: stage-in 0.5s var(--ease) both;
+}
+
+.panel__sure {
+  margin-left: 0.5rem;
+  padding: 0.05rem 0.5rem;
+  font-size: 0.72rem;
+  font-weight: 700;
+  color: var(--bg);
+  background: var(--danger);
+  border-radius: 99px;
+}
+
+.panel__dot--confident_miss {
+  background: var(--danger);
+}

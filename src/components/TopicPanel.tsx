@@ -1,10 +1,11 @@
 import { useEffect, useId, useRef, useState, type KeyboardEvent as ReactKeyboardEvent } from 'react'
-import { isCorrect, type Answer } from '../lib/progress'
+import { isCorrect, type Answer, type Confidence } from '../lib/progress'
 import type { Deck } from '../lib/deck'
 import type { Grounding } from '../lib/grounding'
 import type { Card } from '../lib/schema'
 import type { Progress } from '../lib/tree'
 import { Choices } from './Choices'
+import { ConfidencePicker } from './ConfidencePicker'
 import { Flashcard } from './Flashcard'
 import { Source } from './Source'
 import './TopicPanel.css'
@@ -13,7 +14,7 @@ type Props = {
   deck: Deck
   progress: Progress
   grounding: Record<string, Grounding> | null
-  onAnswer: (cardId: string, correct: boolean) => void
+  onAnswer: (cardId: string, correct: boolean, confidence: Confidence | undefined) => void
   onClose: () => void
 }
 
@@ -54,10 +55,14 @@ export function TopicPanel({ deck, progress, grounding, onAnswer, onClose }: Pro
   const [index, setIndex] = useState(0)
   const [flipped, setFlipped] = useState(false)
   const [answers, setAnswers] = useState<Record<string, Answer>>({})
+  const [confidence, setConfidence] = useState<Record<string, Confidence>>({})
   const [closing, setClosing] = useState(false)
 
   const card = deck.cards[index]
   const answer = answers[card.id]
+  const sureness = confidence[card.id]
+  const askSureness = answer === undefined && !(card.type === 'flashcard' && flipped)
+  const confidentlyWrong = answer !== undefined && sureness === 'certain' && !isCorrect(card, answer)
   const isFirst = index === 0
   const isLast = index === deck.cards.length - 1
 
@@ -76,7 +81,7 @@ export function TopicPanel({ deck, progress, grounding, onAnswer, onClose }: Pro
   function choose(value: Answer) {
     if (answers[card.id] !== undefined) return
     setAnswers((current) => ({ ...current, [card.id]: value }))
-    onAnswer(card.id, isCorrect(card, value))
+    onAnswer(card.id, isCorrect(card, value), confidence[card.id])
   }
 
   useEffect(() => {
@@ -142,6 +147,7 @@ export function TopicPanel({ deck, progress, grounding, onAnswer, onClose }: Pro
           <div>
             <p className="panel__eyebrow">
               {deck.review ? `Mistake ${index + 1} of ${deck.cards.length} · ${deck.topicOf[card.id]}` : `Card ${index + 1} of ${deck.cards.length}`}
+              {deck.review && progress[card.id] === 'confident_miss' && <span className="panel__sure">You were sure</span>}
             </p>
             <h2 id={titleId} className="panel__title">
               {deck.title}
@@ -169,6 +175,9 @@ export function TopicPanel({ deck, progress, grounding, onAnswer, onClose }: Pro
         </div>
 
         <div className="panel__stage" key={card.id}>
+          {askSureness && (
+            <ConfidencePicker value={sureness} onChange={(value) => setConfidence((current) => ({ ...current, [card.id]: value }))} />
+          )}
           {card.type === 'flashcard' && (
             <Flashcard
               card={card}
@@ -197,6 +206,11 @@ export function TopicPanel({ deck, progress, grounding, onAnswer, onClose }: Pro
               explanation={card.explanation}
               onPick={(position) => choose(position === 0)}
             />
+          )}
+          {confidentlyWrong && (
+            <p className="confident-miss">
+              You were certain, so this one goes to the front of your review. Confident mistakes are the ones most worth fixing.
+            </p>
           )}
           {grounding && (
             <Source quote={card.source} grounding={grounding[card.id]} revealed={answer !== undefined || flipped} />
