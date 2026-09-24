@@ -1,11 +1,16 @@
-import { describe, expect, it } from 'vitest'
+import { afterEach, describe, expect, it, vi } from 'vitest'
 import type { GenerateResult } from './api'
 import { createRequester } from './requester'
+
+const CANCELLED: GenerateResult = { ok: false, kind: 'cancelled', message: 'cancelled' }
 
 function controllable() {
   const calls: { text: string; signal: AbortSignal; resolve: (result: GenerateResult) => void }[] = []
   const request = (text: string, signal: AbortSignal) =>
-    new Promise<GenerateResult>((resolve) => calls.push({ text, signal, resolve }))
+    new Promise<GenerateResult>((resolve) => {
+      calls.push({ text, signal, resolve })
+      signal.addEventListener('abort', () => resolve(CANCELLED))
+    })
   return { calls, request }
 }
 
@@ -48,6 +53,39 @@ describe('createRequester', () => {
 
     expect(calls[0].signal.aborted).toBe(true)
     expect(await pending).toEqual({ stale: true })
+  })
+
+  describe('timeout', () => {
+    afterEach(() => {
+      vi.useRealTimers()
+    })
+
+    it('aborts and reports a timeout when there is no answer in time', async () => {
+      vi.useFakeTimers()
+      const { calls, request } = controllable()
+      const requester = createRequester(request, 30_000)
+
+      const pending = requester.run('first')
+      await vi.advanceTimersByTimeAsync(30_000)
+      const outcome = await pending
+
+      expect(calls[0].signal.aborted).toBe(true)
+      expect(outcome.stale === false && outcome.result).toMatchObject({ ok: false, kind: 'timeout' })
+    })
+
+    it('does not time out an answer that arrives in time', async () => {
+      vi.useFakeTimers()
+      const { calls, request } = controllable()
+      const requester = createRequester(request, 30_000)
+
+      const pending = requester.run('first')
+      await vi.advanceTimersByTimeAsync(29_000)
+      calls[0].resolve(failure('in time'))
+      await vi.advanceTimersByTimeAsync(5_000)
+
+      expect(await pending).toEqual({ stale: false, result: failure('in time') })
+      expect(calls[0].signal.aborted).toBe(false)
+    })
   })
 
   it('passes through the result of the only request', async () => {

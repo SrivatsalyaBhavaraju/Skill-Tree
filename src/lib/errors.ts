@@ -9,6 +9,7 @@ export const ERROR_KINDS = [
   'wrong_shape',
   'server',
   'cancelled',
+  'timeout',
 ] as const
 
 export type ErrorKind = (typeof ERROR_KINDS)[number]

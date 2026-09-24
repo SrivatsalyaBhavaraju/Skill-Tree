@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useReducer, useState } from 'react'
 import { Backdrop } from './components/Backdrop'
 import { InputPanel } from './components/InputPanel'
+import { LoadingCard } from './components/LoadingCard'
 import { Toast, type Notice } from './components/Toast'
 import { TopicPanel } from './components/TopicPanel'
 import { TreeView } from './components/TreeView'
@@ -17,7 +18,7 @@ function App() {
   const [opened, setOpened] = useState<{ topic: string } | { review: string[] } | null>(null)
   const [notice, setNotice] = useState<Notice | null>(null)
   const [progress, dispatch] = useReducer(progressReducer, {})
-  const { state, generate } = useGenerateTree()
+  const { state, generate, cancel } = useGenerateTree()
 
   const tree = state.status === 'success' && !editing ? state : null
   const background = tree ? pickBackground(tree.input, tree.tree.subject) : pickBackground(text)
@@ -36,11 +37,11 @@ function App() {
     return node ? topicDeck(node) : null
   }
 
-  function build() {
+  function build(input: string) {
     setEditing(false)
     setOpened(null)
     dispatch({ type: 'reset' })
-    generate(text)
+    generate(input)
   }
 
   function openTopic(id: string) {
@@ -120,16 +121,16 @@ function App() {
             </section>
 
             <div className="reveal reveal--3">
-              <InputPanel value={text} onChange={setText} onSubmit={build} busy={state.status === 'loading'} />
+              <InputPanel value={text} onChange={setText} onSubmit={() => build(text)} busy={state.status === 'loading'} />
             </div>
 
             <section className="app__result" aria-live="polite">
-              {state.status === 'loading' && <p>Building your tree…</p>}
+              {state.status === 'loading' && <LoadingCard onCancel={cancel} />}
 
               {state.status === 'error' && (
                 <p className="app__error">
                   {state.message}{' '}
-                  <button type="button" className="btn" onClick={build}>
+                  <button type="button" className="btn" onClick={() => build(state.input)}>
                     Try again
                   </button>
                 </p>
