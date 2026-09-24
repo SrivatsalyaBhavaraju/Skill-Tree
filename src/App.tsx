@@ -1,18 +1,30 @@
 import { useEffect, useState } from 'react'
 import { Backdrop } from './components/Backdrop'
 import { InputPanel } from './components/InputPanel'
+import { TreeView } from './components/TreeView'
 import { useGenerateTree } from './hooks/useGenerateTree'
 import { pickBackground } from './lib/background'
+import { isNotes } from './lib/input'
+import type { Progress } from './lib/tree'
+
+const NO_PROGRESS: Progress = {}
 
 function App() {
   const [text, setText] = useState('')
+  const [editing, setEditing] = useState(true)
   const { state, generate } = useGenerateTree()
-  const background =
-    state.status === 'success' ? pickBackground(state.input, state.tree.subject) : pickBackground(text)
+
+  const tree = state.status === 'success' && !editing ? state : null
+  const background = tree ? pickBackground(tree.input, tree.tree.subject) : pickBackground(text)
 
   useEffect(() => {
     document.documentElement.dataset.bg = background
   }, [background])
+
+  function build() {
+    setEditing(false)
+    generate(text)
+  }
 
   return (
     <>
@@ -29,53 +41,55 @@ function App() {
             </svg>
             Skill Tree
           </div>
+          {tree && (
+            <button type="button" className="btn" onClick={() => setEditing(true)}>
+              New tree
+            </button>
+          )}
         </header>
 
-        <section className="app__hero">
-          <h1 className="reveal">Study it like a skill tree.</h1>
-          <p className="reveal reveal--2">
-            Paste your notes or name a topic. Every concept becomes a step you unlock by answering its cards.
-          </p>
-        </section>
-
-        <div className="reveal reveal--3">
-          <InputPanel
-            value={text}
-            onChange={setText}
-            onSubmit={() => generate(text)}
-            busy={state.status === 'loading'}
+        {tree ? (
+          <TreeView
+            key={tree.tree.title + tree.input}
+            tree={tree.tree}
+            progress={NO_PROGRESS}
+            fromNotes={isNotes(tree.input)}
+            onOpenTopic={() => {}}
+            onReview={() => {}}
           />
-        </div>
-
-        <section className="app__result" aria-live="polite">
-          {state.status === 'loading' && <p>Building your tree…</p>}
-
-          {state.status === 'error' && (
-            <p className="app__error">
-              {state.message}{' '}
-              <button className="btn" onClick={() => generate(text)}>
-                Try again
-              </button>
-            </p>
-          )}
-
-          {state.status === 'success' && (
-            <div>
-              <h2>{state.tree.title}</h2>
-              <ol>
-                {state.tree.nodes.map((node) => (
-                  <li key={node.id}>
-                    {node.label} · {node.cards.length} cards
-                    {node.prerequisites.length > 0 && ` · needs ${node.prerequisites.join(', ')}`}
-                  </li>
-                ))}
-              </ol>
-              <p>
-                Repair report: {state.report.fixed.length} fixed, {state.report.dropped.length} dropped
+        ) : (
+          <>
+            <section className="app__hero">
+              <h1 className="reveal">Study it like a skill tree.</h1>
+              <p className="reveal reveal--2">
+                Paste your notes or name a topic. Every concept becomes a step you unlock by answering its cards.
               </p>
+            </section>
+
+            <div className="reveal reveal--3">
+              <InputPanel value={text} onChange={setText} onSubmit={build} busy={state.status === 'loading'} />
             </div>
-          )}
-        </section>
+
+            <section className="app__result" aria-live="polite">
+              {state.status === 'loading' && <p>Building your tree…</p>}
+
+              {state.status === 'error' && (
+                <p className="app__error">
+                  {state.message}{' '}
+                  <button type="button" className="btn" onClick={build}>
+                    Try again
+                  </button>
+                </p>
+              )}
+
+              {state.status === 'success' && editing && (
+                <button type="button" className="btn" onClick={() => setEditing(false)}>
+                  Back to “{state.tree.title}”
+                </button>
+              )}
+            </section>
+          </>
+        )}
       </main>
     </>
   )
