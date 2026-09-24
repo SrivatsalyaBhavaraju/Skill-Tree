@@ -1,13 +1,14 @@
 import { useEffect, useId, useRef, useState, type KeyboardEvent as ReactKeyboardEvent } from 'react'
 import { isCorrect, type Answer } from '../lib/progress'
-import type { Card, TopicNode } from '../lib/schema'
+import type { Deck } from '../lib/deck'
+import type { Card } from '../lib/schema'
 import type { Progress } from '../lib/tree'
 import { Choices } from './Choices'
 import { Flashcard } from './Flashcard'
 import './TopicPanel.css'
 
 type Props = {
-  node: TopicNode
+  deck: Deck
   progress: Progress
   onAnswer: (cardId: string, correct: boolean) => void
   onClose: () => void
@@ -44,7 +45,7 @@ function keyHint(card: Card): string {
   return 'Space flip · 1 missed · 2 got it · ← → move · Esc close'
 }
 
-export function TopicPanel({ node, progress, onAnswer, onClose }: Props) {
+export function TopicPanel({ deck, progress, onAnswer, onClose }: Props) {
   const titleId = useId()
   const panel = useRef<HTMLDivElement>(null)
   const [index, setIndex] = useState(0)
@@ -52,14 +53,14 @@ export function TopicPanel({ node, progress, onAnswer, onClose }: Props) {
   const [answers, setAnswers] = useState<Record<string, Answer>>({})
   const [closing, setClosing] = useState(false)
 
-  const card = node.cards[index]
+  const card = deck.cards[index]
   const answer = answers[card.id]
   const isFirst = index === 0
-  const isLast = index === node.cards.length - 1
+  const isLast = index === deck.cards.length - 1
 
   function go(step: number) {
     const next = index + step
-    if (next < 0 || next >= node.cards.length) return
+    if (next < 0 || next >= deck.cards.length) return
     setIndex(next)
     setFlipped(false)
   }
@@ -137,12 +138,12 @@ export function TopicPanel({ node, progress, onAnswer, onClose }: Props) {
         <header className="panel__head">
           <div>
             <p className="panel__eyebrow">
-              Card {index + 1} of {node.cards.length}
+              {deck.review ? `Mistake ${index + 1} of ${deck.cards.length} · ${deck.topicOf[card.id]}` : `Card ${index + 1} of ${deck.cards.length}`}
             </p>
             <h2 id={titleId} className="panel__title">
-              {node.label}
+              {deck.title}
             </h2>
-            {node.summary && <p className="panel__summary">{node.summary}</p>}
+            {deck.summary && <p className="panel__summary">{deck.summary}</p>}
           </div>
           <button type="button" className="panel__close" onClick={close} aria-label="Close">
             <svg viewBox="0 0 24 24" aria-hidden="true">
@@ -152,7 +153,7 @@ export function TopicPanel({ node, progress, onAnswer, onClose }: Props) {
         </header>
 
         <div className="panel__dots" aria-hidden="true">
-          {node.cards.map((item, position) => (
+          {deck.cards.map((item, position) => (
             <i
               key={item.id}
               className={[

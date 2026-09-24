@@ -6,6 +6,7 @@ import { TopicPanel } from './components/TopicPanel'
 import { TreeView } from './components/TreeView'
 import { useGenerateTree } from './hooks/useGenerateTree'
 import { pickBackground } from './lib/background'
+import { missedCardIds, reviewDeck, topicDeck } from './lib/deck'
 import { isNotes } from './lib/input'
 import { progressReducer } from './lib/progress'
 import { isComplete, statusText, topicStatus } from './lib/tree'
@@ -13,7 +14,7 @@ import { isComplete, statusText, topicStatus } from './lib/tree'
 function App() {
   const [text, setText] = useState('')
   const [editing, setEditing] = useState(true)
-  const [openId, setOpenId] = useState<string | null>(null)
+  const [opened, setOpened] = useState<{ topic: string } | { review: string[] } | null>(null)
   const [notice, setNotice] = useState<Notice | null>(null)
   const [progress, dispatch] = useReducer(progressReducer, {})
   const { state, generate } = useGenerateTree()
@@ -26,11 +27,18 @@ function App() {
   }, [background])
 
   const clearNotice = useCallback(() => setNotice(null), [])
-  const openNode = tree?.tree.nodes.find((node) => node.id === openId) ?? null
+  const deck = openDeck()
+
+  function openDeck() {
+    if (!tree || !opened) return null
+    if ('review' in opened) return reviewDeck(tree.tree.nodes, opened.review)
+    const node = tree.tree.nodes.find((item) => item.id === opened.topic)
+    return node ? topicDeck(node) : null
+  }
 
   function build() {
     setEditing(false)
-    setOpenId(null)
+    setOpened(null)
     dispatch({ type: 'reset' })
     generate(text)
   }
@@ -44,8 +52,14 @@ function App() {
     if (topicStatus(node, nodes, progress) === 'locked') {
       setNotice({ id: Date.now(), text: `${node.label}: ${statusText(node, nodes, progress)}` })
     } else {
-      setOpenId(id)
+      setOpened({ topic: id })
     }
+  }
+
+  function openReview() {
+    if (!tree) return
+    const ids = missedCardIds(tree.tree.nodes, progress)
+    if (ids.length > 0) setOpened({ review: ids })
   }
 
   function answer(cardId: string, correct: boolean) {
@@ -91,10 +105,10 @@ function App() {
             key={tree.tree.title + tree.input}
             tree={tree.tree}
             progress={progress}
-            paused={openNode !== null}
+            paused={deck !== null}
             fromNotes={isNotes(tree.input)}
             onOpenTopic={openTopic}
-            onReview={() => {}}
+            onReview={openReview}
           />
         ) : (
           <>
@@ -131,9 +145,7 @@ function App() {
         )}
       </main>
 
-      {openNode && (
-        <TopicPanel key={openNode.id} node={openNode} progress={progress} onAnswer={answer} onClose={() => setOpenId(null)} />
-      )}
+      {deck && <TopicPanel key={deck.id} deck={deck} progress={progress} onAnswer={answer} onClose={() => setOpened(null)} />}
       <Toast notice={notice} onDone={clearNotice} />
     </>
   )
