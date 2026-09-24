@@ -1,17 +1,21 @@
-import { useEffect, useState } from 'react'
+import { useCallback, useEffect, useState } from 'react'
 import { Backdrop } from './components/Backdrop'
 import { InputPanel } from './components/InputPanel'
+import { Toast, type Notice } from './components/Toast'
+import { TopicPanel } from './components/TopicPanel'
 import { TreeView } from './components/TreeView'
 import { useGenerateTree } from './hooks/useGenerateTree'
 import { pickBackground } from './lib/background'
 import { isNotes } from './lib/input'
-import type { Progress } from './lib/tree'
+import { statusText, topicStatus, type Progress } from './lib/tree'
 
 const NO_PROGRESS: Progress = {}
 
 function App() {
   const [text, setText] = useState('')
   const [editing, setEditing] = useState(true)
+  const [openId, setOpenId] = useState<string | null>(null)
+  const [notice, setNotice] = useState<Notice | null>(null)
   const { state, generate } = useGenerateTree()
 
   const tree = state.status === 'success' && !editing ? state : null
@@ -21,9 +25,26 @@ function App() {
     document.documentElement.dataset.bg = background
   }, [background])
 
+  const clearNotice = useCallback(() => setNotice(null), [])
+  const openNode = tree?.tree.nodes.find((node) => node.id === openId) ?? null
+
   function build() {
     setEditing(false)
+    setOpenId(null)
     generate(text)
+  }
+
+  function openTopic(id: string) {
+    if (!tree) return
+    const nodes = tree.tree.nodes
+    const node = nodes.find((item) => item.id === id)
+    if (!node) return
+
+    if (topicStatus(node, nodes, NO_PROGRESS) === 'locked') {
+      setNotice({ id: Date.now(), text: `${node.label}: ${statusText(node, nodes, NO_PROGRESS)}` })
+    } else {
+      setOpenId(id)
+    }
   }
 
   return (
@@ -54,7 +75,7 @@ function App() {
             tree={tree.tree}
             progress={NO_PROGRESS}
             fromNotes={isNotes(tree.input)}
-            onOpenTopic={() => {}}
+            onOpenTopic={openTopic}
             onReview={() => {}}
           />
         ) : (
@@ -91,6 +112,9 @@ function App() {
           </>
         )}
       </main>
+
+      {openNode && <TopicPanel key={openNode.id} node={openNode} onClose={() => setOpenId(null)} />}
+      <Toast notice={notice} onDone={clearNotice} />
     </>
   )
 }
