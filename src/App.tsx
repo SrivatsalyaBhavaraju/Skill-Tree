@@ -117,6 +117,8 @@ function App() {
               progress={progress}
               paused={deck !== null}
               fromNotes={isNotes(tree.input)}
+              report={tree.report}
+              repaired={tree.repaired}
               onOpenTopic={openTopic}
               onReview={openReview}
             />
