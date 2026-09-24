@@ -1,10 +1,22 @@
 import { useEffect, useMemo, useRef, useState } from 'react'
+import { passMark } from '../lib/boss'
 import { celebrate, unlock } from '../lib/effects'
 import type { Grounding } from '../lib/grounding'
 import type { SkillTree } from '../lib/schema'
-import { countCards, isComplete, levelsOf, nextTopic, statusText, summarize, topicStatus, type Progress } from '../lib/tree'
+import {
+  countCards,
+  isComplete,
+  levelsOf,
+  nextTopic,
+  statusText,
+  summarize,
+  topicStatus,
+  type Progress,
+  type TopicStatus,
+} from '../lib/tree'
 import type { RepairReport as Report } from '../lib/validate'
 import { Connectors, type Edge } from './Connectors'
+import { FinalTile } from './FinalTile'
 import { RepairReport } from './RepairReport'
 import { TopicTile } from './TopicTile'
 import './TreeView.css'
@@ -17,8 +29,19 @@ type Props = {
   report: Report
   repaired: boolean
   grounding: Record<string, Grounding> | null
+  finalQuestions: number
+  finalScore: { score: number; total: number } | null
+  onOpenFinal: () => void
   onOpenTopic: (id: string) => void
   onReview: () => void
+}
+
+const FINAL_ID = '__final__'
+
+function finalText(status: TopicStatus, left: number, questions: number, score: { score: number; total: number } | null) {
+  if (status === 'locked') return `Locked · ${left} topic${left === 1 ? '' : 's'} to go`
+  if (status === 'done' && score) return `Passed · ${score.score} of ${score.total}`
+  return `Timed · ${questions} questions · pass with ${passMark(questions)}`
 }
 
 function levelName(index: number): string {
@@ -33,17 +56,30 @@ export function TreeView({
   report,
   repaired,
   grounding,
+  finalQuestions,
+  finalScore: latestScore,
+  onOpenFinal,
   onOpenTopic,
   onReview,
 }: Props) {
   const board = useRef<HTMLElement>(null)
   const tiles = useRef(new Map<string, HTMLElement>())
   const [progress, setProgress] = useState(latest)
+  const [finalScore, setFinalScore] = useState(latestScore)
   if (!paused && progress !== latest) setProgress(latest)
+  if (!paused && finalScore !== latestScore) setFinalScore(latestScore)
+
+  const allDone = tree.nodes.every((node) => isComplete(node, progress))
+  const hasFinal = finalQuestions > 0
+  const finalStatus: TopicStatus = !allDone ? 'locked' : finalScore ? 'done' : 'ready'
 
   const statuses = useMemo(
-    () => new Map(tree.nodes.map((node) => [node.id, topicStatus(node, tree.nodes, progress)])),
-    [tree.nodes, progress],
+    () =>
+      new Map<string, TopicStatus>([
+        ...tree.nodes.map((node) => [node.id, topicStatus(node, tree.nodes, progress)] as const),
+        ...(hasFinal ? [[FINAL_ID, finalStatus] as const] : []),
+      ]),
+    [tree.nodes, progress, hasFinal, finalStatus],
   )
   const previous = useRef(statuses)
 
@@ -79,8 +115,14 @@ export function TreeView({
             statuses.get(node.id) !== 'locked'
           return { from: id, to: node.id, lit }
         }),
+      ).concat(
+        hasFinal
+          ? tree.nodes
+              .filter((node) => !tree.nodes.some((other) => other.prerequisites.includes(node.id)))
+              .map((node) => ({ from: node.id, to: FINAL_ID, lit: allDone }))
+          : [],
       ),
-    [tree.nodes, progress, statuses],
+    [tree.nodes, progress, statuses, hasFinal, allDone],
   )
 
   let order = 0
@@ -116,15 +158,21 @@ export function TreeView({
             Review mistakes
             {summary.missed > 0 && <span className="tree__count">{summary.missed}</span>}
           </button>
-          <button
-            type="button"
-            className="btn btn--primary"
-            onClick={() => next && onOpenTopic(next.id)}
-            disabled={next === null}
-          >
-            {next ? `Continue: ${next.label}` : 'All topics complete'}
-            {next && <span aria-hidden="true">→</span>}
-          </button>
+          {next || finalStatus !== 'ready' ? (
+            <button
+              type="button"
+              className="btn btn--primary"
+              onClick={() => next && onOpenTopic(next.id)}
+              disabled={next === null}
+            >
+              {next ? `Continue: ${next.label}` : finalStatus === 'done' ? 'Tree complete' : 'All topics complete'}
+              {next && <span aria-hidden="true">→</span>}
+            </button>
+          ) : (
+            <button type="button" className="btn btn--primary" onClick={onOpenFinal}>
+              Take the final test <span aria-hidden="true">→</span>
+            </button>
+          )}
         </div>
       </section>
 
@@ -160,6 +208,24 @@ export function TreeView({
             </div>
           </div>
         ))}
+
+        {hasFinal && (
+          <div className="tree__level">
+            <p className="tree__level-name">Final</p>
+            <div className="tree__level-row">
+              <FinalTile
+                status={finalStatus}
+                text={finalText(finalStatus, tree.nodes.length - summary.topicsDone, finalQuestions, finalScore)}
+                order={order++}
+                onOpen={onOpenFinal}
+                tileRef={(element) => {
+                  if (element) tiles.current.set(FINAL_ID, element)
+                  else tiles.current.delete(FINAL_ID)
+                }}
+              />
+            </div>
+          </div>
+        )}
       </section>
     </div>
   )

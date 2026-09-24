@@ -4,6 +4,7 @@ import type { Deck } from '../lib/deck'
 import type { Grounding } from '../lib/grounding'
 import type { Card } from '../lib/schema'
 import type { Progress } from '../lib/tree'
+import { useDialog } from '../hooks/useDialog'
 import { Choices } from './Choices'
 import { ConfidencePicker } from './ConfidencePicker'
 import { Flashcard } from './Flashcard'
@@ -58,7 +59,7 @@ function keyHint(card: Card): string {
 
 export function TopicPanel({ deck, progress, grounding, onAnswer, onFix, onClose }: Props) {
   const titleId = useId()
-  const panel = useRef<HTMLDivElement>(null)
+  const { dialog: panel, trapTab } = useDialog<HTMLDivElement>()
   const [index, setIndex] = useState(0)
   const [flipped, setFlipped] = useState(false)
   const [answers, setAnswers] = useState<Record<string, Answer>>({})
@@ -106,16 +107,9 @@ export function TopicPanel({ deck, progress, grounding, onAnswer, onFix, onClose
   }
 
   useEffect(() => {
-    const opener = document.activeElement as HTMLElement | null
-    const scroll = document.body.style.overflow
-    document.body.style.overflow = 'hidden'
-    panel.current?.focus()
     mounted.current = true
-
     return () => {
       mounted.current = false
-      document.body.style.overflow = scroll
-      opener?.focus()
     }
   }, [])
 
@@ -135,18 +129,8 @@ export function TopicPanel({ deck, progress, grounding, onAnswer, onFix, onClose
     } else if (event.key === ' ' && !onButton && card.type === 'flashcard') {
       event.preventDefault()
       setFlipped((value) => !value)
-    } else if (event.key === 'Tab') {
-      const focusable = panel.current?.querySelectorAll<HTMLElement>('button:not(:disabled)')
-      if (!focusable || focusable.length === 0) return
-      const first = focusable[0]
-      const last = focusable[focusable.length - 1]
-      if (event.shiftKey && document.activeElement === first) {
-        event.preventDefault()
-        last.focus()
-      } else if (!event.shiftKey && document.activeElement === last) {
-        event.preventDefault()
-        first.focus()
-      }
+    } else {
+      trapTab(event)
     }
   }
 

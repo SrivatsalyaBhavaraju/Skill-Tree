@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useMemo, useReducer, useRef, useState } from 'react'
 import { Backdrop } from './components/Backdrop'
+import { BossBattle } from './components/BossBattle'
 import { ChaosPanel } from './components/ChaosPanel'
 import { ErrorBoundary } from './components/ErrorBoundary'
 import { ErrorCard } from './components/ErrorCard'
@@ -12,6 +13,7 @@ import { TreeView } from './components/TreeView'
 import { useGenerateTree } from './hooks/useGenerateTree'
 import { requestCardFix } from './lib/api'
 import { pickBackground } from './lib/background'
+import { bossQuestions } from './lib/boss'
 import type { ChaosScenario } from './lib/chaos'
 import { missedCardIds, reviewDeck, topicDeck } from './lib/deck'
 import { ERROR_COPY } from './lib/errorMessages'
@@ -26,7 +28,8 @@ const CHAOS_ENABLED = new URLSearchParams(window.location.search).has('chaos')
 function App() {
   const [text, setText] = useState('')
   const [editing, setEditing] = useState(true)
-  const [opened, setOpened] = useState<{ topic: string } | { review: string[] } | null>(null)
+  const [opened, setOpened] = useState<{ topic: string } | { review: string[] } | { final: true } | null>(null)
+  const [finalScore, setFinalScore] = useState<{ score: number; total: number } | null>(null)
   const [notice, setNotice] = useState<Notice | null>(null)
   const [progress, dispatch] = useReducer(progressReducer, {})
   const [chaos, setChaos] = useState<ChaosScenario>('normal')
@@ -52,9 +55,12 @@ function App() {
     [tree, shown],
   )
   const deck = openDeck()
+  const questions = useMemo(() => (shown ? bossQuestions(shown.nodes) : []), [shown])
+  const finalOpen = opened !== null && 'final' in opened && shown !== null && shown.nodes.every((node) => isComplete(node, progress))
 
   function openDeck() {
     if (!shown || !opened) return null
+    if ('final' in opened) return null
     if ('review' in opened) return reviewDeck(shown.nodes, opened.review)
     const node = shown.nodes.find((item) => item.id === opened.topic)
     return node ? topicDeck(node) : null
@@ -64,6 +70,7 @@ function App() {
     setEditing(false)
     setOpened(null)
     setFixes({})
+    setFinalScore(null)
     dispatch({ type: 'reset' })
     generate(input, CHAOS_ENABLED ? chaos : undefined)
   }
@@ -84,6 +91,21 @@ function App() {
     } else {
       setOpened({ topic: id })
     }
+  }
+
+  function openFinal() {
+    if (!shown) return
+    const left = shown.nodes.filter((node) => !isComplete(node, progress)).length
+    if (left > 0) {
+      setNotice({ id: Date.now(), text: `Final test: finish ${left} more topic${left === 1 ? '' : 's'} first` })
+    } else {
+      setOpened({ final: true })
+    }
+  }
+
+  function passFinal(score: number, total: number) {
+    setFinalScore({ score, total })
+    setNotice({ id: Date.now(), text: `Final test passed with ${score} of ${total}. The whole tree is yours.` })
   }
 
   function openReview() {
@@ -157,11 +179,14 @@ function App() {
               key={tree.tree.title + tree.input}
               tree={shown ?? tree.tree}
               progress={progress}
-              paused={deck !== null}
+              paused={deck !== null || finalOpen}
               fromNotes={isNotes(tree.input)}
               report={tree.report}
               repaired={tree.repaired}
               grounding={grounding}
+              finalQuestions={questions.length}
+              finalScore={finalScore}
+              onOpenFinal={openFinal}
               onOpenTopic={openTopic}
               onReview={openReview}
             />
@@ -209,6 +234,11 @@ function App() {
             onFix={fixCard}
             onClose={() => setOpened(null)}
           />
+        </ErrorBoundary>
+      )}
+      {finalOpen && (
+        <ErrorBoundary onReset={startOver}>
+          <BossBattle questions={questions} onPass={passFinal} onClose={() => setOpened(null)} />
         </ErrorBoundary>
       )}
       <Toast notice={notice} onDone={clearNotice} />

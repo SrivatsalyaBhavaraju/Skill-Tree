@@ -375,3 +375,34 @@
     width: 100%;
   }
 }
+
+.topic--final {
+  width: 320px;
+  grid-template-columns: 48px 1fr;
+  padding: 1rem 1.2rem 1.05rem 1rem;
+  border-width: 1.5px;
+}
+
+.topic--final .topic__icon {
+  width: 48px;
+  height: 48px;
+}
+
+.topic--final .topic__icon svg {
+  width: 24px;
+  height: 24px;
+}
+
+.topic--final .topic__title {
+  font-size: 1.2rem;
+}
+
+.topic--final.topic--done {
+  background: color-mix(in srgb, var(--done) 12%, var(--surface));
+}
+
+@media (max-width: 760px) {
+  .topic--final {
+    width: 100%;
+  }
+}
