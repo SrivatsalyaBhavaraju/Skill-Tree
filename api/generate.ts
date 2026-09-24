@@ -1,4 +1,8 @@
 export async function POST(request: Request): Promise<Response> {
+  if (!process.env.GEMINI_API_KEY) {
+    return Response.json({ error: 'The server is missing its API key.' }, { status: 500 })
+  }
+
   let body: unknown
   try {
     body = await request.json()

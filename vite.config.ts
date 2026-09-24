@@ -1,7 +1,7 @@
 import { existsSync } from 'node:fs'
 import type { IncomingMessage } from 'node:http'
 import path from 'node:path'
-import { defineConfig, type Plugin } from 'vite'
+import { defineConfig, loadEnv, type Plugin } from 'vite'
 import react from '@vitejs/plugin-react'
 
 function readBody(req: IncomingMessage): Promise<Buffer> {
@@ -59,6 +59,13 @@ function apiDevServer(): Plugin {
   }
 }
 
-export default defineConfig({
-  plugins: [react(), apiDevServer()],
+export default defineConfig(({ mode }) => {
+  const env = loadEnv(mode, process.cwd(), '')
+  for (const [key, value] of Object.entries(env)) {
+    process.env[key] ??= value
+  }
+
+  return {
+    plugins: [react(), apiDevServer()],
+  }
 })
