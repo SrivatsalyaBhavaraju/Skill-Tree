@@ -59,3 +59,18 @@ export function buildPrompt(text: string): Prompt {
 
   return { system, user }
 }
+
+const MAX_ECHO_CHARS = 6000
+
+export function buildRepairPrompt(original: Prompt, badReply: string, problems: string[]): Prompt {
+  const echo = badReply.length > MAX_ECHO_CHARS ? `${badReply.slice(0, MAX_ECHO_CHARS)}\n[cut off]` : badReply
+
+  const user = [
+    original.user,
+    `Your previous reply could not be used:\n${problems.map((problem) => `- ${problem}`).join('\n')}`,
+    `Your previous reply:\n"""\n${echo || '(empty)'}\n"""`,
+    'Reply again with the complete, corrected JSON only, in exactly the required shape.',
+  ].join('\n\n')
+
+  return { system: original.system, user }
+}

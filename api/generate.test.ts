@@ -151,7 +151,7 @@ describe('POST /api/generate', () => {
       ['empty.txt', 'empty'],
       ['wrong-shape.json', 'wrong_shape'],
     ])('reports unusable model output (%s) as %s', async (name, kind) => {
-      fetchMock.mockResolvedValue(geminiReply(fixture(name)))
+      fetchMock.mockImplementation(async () => geminiReply(fixture(name)))
 
       const { status, body } = await send('{"text":"Photosynthesis"}')
 
@@ -159,8 +159,43 @@ describe('POST /api/generate', () => {
       expect(body.error.kind).toBe(kind)
     })
 
+    it('repairs unusable output once by sending the problems back', async () => {
+      fetchMock
+        .mockResolvedValueOnce(geminiReply(fixture('malformed-truncated.txt')))
+        .mockResolvedValueOnce(geminiReply(fixture('valid-tree.json')))
+
+      const { status, body } = await send('{"text":"Photosynthesis"}')
+
+      expect(status).toBe(200)
+      expect(body.repaired).toBe(true)
+      expect(body.tree.nodes).toHaveLength(4)
+      expect(fetchMock).toHaveBeenCalledTimes(2)
+      const repairRequest = JSON.parse(String(fetchMock.mock.calls[1][1]?.body))
+      expect(repairRequest.contents[0].parts[0].text).toContain('could not be used')
+    })
+
+    it('gives up after one repair attempt', async () => {
+      fetchMock.mockImplementation(async () => geminiReply(fixture('wrong-shape.json')))
+
+      const { status, body } = await send('{"text":"Photosynthesis"}')
+
+      expect(status).toBe(502)
+      expect(body.error.kind).toBe('wrong_shape')
+      expect(body.error.message).toContain('A repair attempt did not fix it.')
+      expect(fetchMock).toHaveBeenCalledTimes(2)
+    })
+
+    it('does not repair output that was usable the first time', async () => {
+      fetchMock.mockResolvedValue(geminiReply(fixture('partially-broken.json')))
+
+      const { body } = await send('{"text":"Photosynthesis"}')
+
+      expect(body.repaired).toBe(false)
+      expect(fetchMock).toHaveBeenCalledTimes(1)
+    })
+
     it('treats a reply with no candidates as empty', async () => {
-      fetchMock.mockResolvedValue(Response.json({ promptFeedback: { blockReason: 'SAFETY' } }))
+      fetchMock.mockImplementation(async () => Response.json({ promptFeedback: { blockReason: 'SAFETY' } }))
 
       const { body } = await send('{"text":"Photosynthesis"}')
 

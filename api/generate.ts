@@ -2,7 +2,7 @@ import type { ErrorKind } from '../src/lib/errors'
 import { checkInput } from '../src/lib/input'
 import { readModelOutput } from '../src/lib/validate'
 import { callGemini } from './gemini'
-import { buildPrompt } from './prompt'
+import { buildPrompt, buildRepairPrompt } from './prompt'
 
 const STATUS: Record<ErrorKind, number> = {
   bad_input: 400,
@@ -54,15 +54,29 @@ export async function POST(request: Request): Promise<Response> {
   }
 
   const signal = AbortSignal.any([request.signal, AbortSignal.timeout(MODEL_TIMEOUT_MS)])
-  const reply = await callGemini(buildPrompt(text), apiKey, signal)
+  const prompt = buildPrompt(text)
+
+  const reply = await callGemini(prompt, apiKey, signal)
   if (!reply.ok) {
     return errorResponse(reply.kind, reply.message)
   }
 
-  const result = readModelOutput(reply.text)
+  let result = readModelOutput(reply.text)
+  let repaired = false
+
   if (!result.ok) {
-    return errorResponse(result.kind, result.message)
+    const problems = [result.message, ...result.details]
+    const retry = await callGemini(buildRepairPrompt(prompt, reply.text, problems), apiKey, signal)
+    if (!retry.ok) {
+      return errorResponse(retry.kind, retry.message)
+    }
+    result = readModelOutput(retry.text)
+    repaired = true
   }
 
-  return Response.json({ tree: result.tree, report: result.report })
+  if (!result.ok) {
+    return errorResponse(result.kind, `${result.message} A repair attempt did not fix it.`)
+  }
+
+  return Response.json({ tree: result.tree, report: result.report, repaired })
 }

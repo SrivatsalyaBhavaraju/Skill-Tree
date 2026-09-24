@@ -3,7 +3,7 @@ import type { SkillTree } from './schema'
 import { isRecord, validateTree, type RepairReport } from './validate'
 
 export type GenerateResult =
-  | { ok: true; tree: SkillTree; report: RepairReport }
+  | { ok: true; tree: SkillTree; report: RepairReport; repaired: boolean }
   | { ok: false; kind: ErrorKind; message: string }
 
 function strings(value: unknown): string[] {
@@ -60,6 +60,7 @@ export async function requestTree(text: string, signal?: AbortSignal): Promise<G
   return {
     ok: true,
     tree: result.tree,
+    repaired: isRecord(body) && body.repaired === true,
     report: {
       fixed: [...serverReport.fixed, ...result.report.fixed],
       dropped: [...serverReport.dropped, ...result.report.dropped],

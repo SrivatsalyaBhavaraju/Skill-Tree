@@ -42,6 +42,14 @@ describe('requestTree', () => {
     expect(result.ok && result.report).toEqual(report)
   })
 
+  it('passes on whether the server needed a repair retry', async () => {
+    fetchMock.mockResolvedValue(Response.json({ tree: validServerTree(), report: {}, repaired: true }))
+
+    const result = await requestTree('Photosynthesis')
+
+    expect(result.ok && result.repaired).toBe(true)
+  })
+
   it('does not trust a tree from the server that fails validation', async () => {
     fetchMock.mockResolvedValue(Response.json({ tree: { title: 'X', nodes: [] }, report: {} }))
 
