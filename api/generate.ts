@@ -14,6 +14,7 @@ const STATUS: Record<ErrorKind, number> = {
   malformed: 502,
   wrong_shape: 502,
   server: 500,
+  cancelled: 499,
 }
 
 function errorResponse(kind: ErrorKind, message: string): Response {

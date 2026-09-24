@@ -39,12 +39,18 @@ function apiDevServer(): Plugin {
           }
 
           const body = method === 'GET' || method === 'HEAD' ? undefined : await readBody(req)
+          const abort = new AbortController()
+          res.on('close', () => {
+            if (!res.writableEnded) abort.abort()
+          })
           const request = new Request(`http://localhost/api${route}`, {
             method,
             headers: { 'content-type': req.headers['content-type'] ?? '' },
             body,
+            signal: abort.signal,
           })
           const response: Response = await handler(request)
+          if (abort.signal.aborted) return
 
           res.statusCode = response.status
           response.headers.forEach((value, key) => res.setHeader(key, value))

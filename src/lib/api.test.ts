@@ -79,6 +79,25 @@ describe('requestTree', () => {
     expect(!result.ok && result.message).toContain('504')
   })
 
+  it('reports a cancelled request as cancelled, not as a network error', async () => {
+    const controller = new AbortController()
+    controller.abort()
+    fetchMock.mockRejectedValue(new DOMException('The operation was aborted.', 'AbortError'))
+
+    const result = await requestTree('Photosynthesis', controller.signal)
+
+    expect(!result.ok && result.kind).toBe('cancelled')
+  })
+
+  it('passes the abort signal to fetch', async () => {
+    const controller = new AbortController()
+    fetchMock.mockResolvedValue(Response.json({ tree: validServerTree(), report: {} }))
+
+    await requestTree('Photosynthesis', controller.signal)
+
+    expect(fetchMock.mock.calls[0][1]?.signal).toBe(controller.signal)
+  })
+
   it('reports a network failure', async () => {
     fetchMock.mockRejectedValue(new TypeError('Failed to fetch'))
 

@@ -23,15 +23,19 @@ function readError(body: unknown, status: number): GenerateResult {
   return { ok: false, kind: 'server', message: `The server returned an error (${status}).` }
 }
 
-export async function requestTree(text: string): Promise<GenerateResult> {
+const CANCELLED: GenerateResult = { ok: false, kind: 'cancelled', message: 'The request was cancelled.' }
+
+export async function requestTree(text: string, signal?: AbortSignal): Promise<GenerateResult> {
   let response: Response
   try {
     response = await fetch('/api/generate', {
       method: 'POST',
       headers: { 'content-type': 'application/json' },
       body: JSON.stringify({ text }),
+      signal,
     })
   } catch {
+    if (signal?.aborted) return CANCELLED
     return { ok: false, kind: 'network', message: 'Could not reach the server. Check your connection.' }
   }
 
@@ -39,6 +43,7 @@ export async function requestTree(text: string): Promise<GenerateResult> {
   try {
     body = await response.json()
   } catch {
+    if (signal?.aborted) return CANCELLED
     return { ok: false, kind: 'server', message: `The server sent a response we could not read (${response.status}).` }
   }
 
