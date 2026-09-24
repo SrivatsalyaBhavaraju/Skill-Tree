@@ -1,0 +1,117 @@
+.input-panel {
+  display: grid;
+  gap: 0.5rem;
+}
+
+.input-panel__label {
+  font-size: 0.8125rem;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+
+.input-panel__field {
+  width: 100%;
+  min-height: 10rem;
+  padding: 0.875rem 1rem;
+  resize: vertical;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  line-height: 1.6;
+}
+
+.input-panel__field:hover {
+  border-color: var(--border-strong);
+}
+
+.input-panel__field:focus-visible {
+  outline: none;
+  border-color: var(--accent);
+}
+
+.input-panel__field::placeholder {
+  color: var(--muted);
+}
+
+.input-panel__footer {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem 1.5rem;
+}
+
+.input-panel__hint {
+  flex: 1 1 18rem;
+  margin: 0;
+  font-size: 0.875rem;
+  color: var(--muted);
+}
+
+.input-panel__actions {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  margin-left: auto;
+}
+
+.input-panel__count {
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
+  font-variant-numeric: tabular-nums;
+  color: var(--muted);
+}
+
+.input-panel__count--warn {
+  color: var(--warning);
+}
+
+.input-panel__submit {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.625rem;
+  min-height: 2.75rem;
+  padding: 0 1.125rem;
+  font-weight: 600;
+  background: var(--accent);
+  color: var(--accent-text);
+  border: 1px solid transparent;
+  border-radius: var(--radius);
+  cursor: pointer;
+}
+
+.input-panel__submit:hover:not(:disabled) {
+  filter: brightness(1.08);
+}
+
+.input-panel__submit:disabled {
+  background: transparent;
+  color: var(--muted);
+  border-color: var(--border);
+  cursor: not-allowed;
+}
+
+.input-panel__kbd {
+  font-family: var(--font-mono);
+  font-size: 0.6875rem;
+  opacity: 0.7;
+}
+
+.input-panel__error {
+  margin: 0;
+  font-size: 0.875rem;
+  color: var(--danger);
+}
+
+@media (max-width: 480px) {
+  .input-panel__actions {
+    width: 100%;
+    justify-content: space-between;
+  }
+
+  .input-panel__kbd {
+    display: none;
+  }
+}
