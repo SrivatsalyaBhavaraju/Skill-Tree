@@ -12,11 +12,12 @@ export const CHECKS = [
   'Size limits',
 ]
 
-export function receiptLine(report: RepairReport, repaired: boolean): { clean: boolean; text: string } {
+export function receiptLine(report: RepairReport, repaired: boolean, unverified = 0): { clean: boolean; text: string } {
   const parts = [
     report.fixed.length > 0 && `${report.fixed.length} fixed`,
     report.dropped.length > 0 && `${report.dropped.length} dropped`,
     repaired && '1 automatic retry',
+    unverified > 0 && `${unverified} not found in your notes`,
   ].filter((part): part is string => typeof part === 'string')
 
   return parts.length === 0

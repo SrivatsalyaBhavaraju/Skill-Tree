@@ -2,6 +2,7 @@ export const CHAOS_SCENARIOS = {
   normal: { label: 'Normal', detail: 'Real Gemini call' },
   partial: { label: 'Partially broken', detail: 'Bad index, duplicate option, loop, broken topic: salvaged' },
   repair: { label: 'Broken, then fixed', detail: 'Unusable first answer, fixed by the repair retry' },
+  invented: { label: 'Invented quotes', detail: 'Cards quoting things not in your notes (use the sample notes)' },
   malformed: { label: 'Malformed JSON', detail: 'Answer cut off mid-string, twice' },
   wrong_shape: { label: 'Wrong shape', detail: 'Valid JSON with the wrong keys, twice' },
   empty: { label: 'Empty', detail: 'The model returns nothing, twice' },

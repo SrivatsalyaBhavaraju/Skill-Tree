@@ -25,6 +25,7 @@ function wait(ms: number, signal: AbortSignal): Promise<boolean> {
 const REPLIES: Record<Exclude<ChaosScenario, 'normal' | 'server_error'>, string[]> = {
   partial: ['partially-broken.json'],
   repair: ['malformed-truncated.txt', 'valid-tree.json'],
+  invented: ['hallucinated-sources.json'],
   malformed: ['malformed-truncated.txt'],
   wrong_shape: ['wrong-shape.json'],
   empty: ['empty.txt'],

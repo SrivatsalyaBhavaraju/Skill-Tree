@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useRef, useState } from 'react'
 import { celebrate, unlock } from '../lib/effects'
+import type { Grounding } from '../lib/grounding'
 import type { SkillTree } from '../lib/schema'
 import { countCards, isComplete, levelsOf, nextTopic, statusText, summarize, topicStatus, type Progress } from '../lib/tree'
 import type { RepairReport as Report } from '../lib/validate'
@@ -15,6 +16,7 @@ type Props = {
   fromNotes: boolean
   report: Report
   repaired: boolean
+  grounding: Record<string, Grounding> | null
   onOpenTopic: (id: string) => void
   onReview: () => void
 }
@@ -23,7 +25,17 @@ function levelName(index: number): string {
   return index === 0 ? 'Start' : `Level ${index + 1}`
 }
 
-export function TreeView({ tree, progress: latest, paused, fromNotes, report, repaired, onOpenTopic, onReview }: Props) {
+export function TreeView({
+  tree,
+  progress: latest,
+  paused,
+  fromNotes,
+  report,
+  repaired,
+  grounding,
+  onOpenTopic,
+  onReview,
+}: Props) {
   const board = useRef<HTMLElement>(null)
   const tiles = useRef(new Map<string, HTMLElement>())
   const [progress, setProgress] = useState(latest)
@@ -82,7 +94,7 @@ export function TreeView({ tree, progress: latest, paused, fromNotes, report, re
           <span>{summary.cards} cards</span>
         </p>
         <h1 className="tree__title reveal reveal--2">{tree.title}</h1>
-        <RepairReport report={report} repaired={repaired} />
+        <RepairReport report={report} repaired={repaired} grounding={grounding} />
       </header>
 
       <section className="tree__summary reveal reveal--3" aria-label="Progress">

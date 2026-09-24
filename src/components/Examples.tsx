@@ -1,3 +1,4 @@
+import sampleNotes from '../../fixtures/notes-photosynthesis.txt?raw'
 import './Examples.css'
 
 type Example = {
@@ -19,15 +20,8 @@ const EXAMPLES: Example[] = [
   },
   {
     kind: 'Your notes',
-    label: 'Sample notes: the water cycle',
-    text: [
-      'The water cycle moves water between the oceans, the air and the land.',
-      'Evaporation turns liquid water from oceans and lakes into water vapour, powered by heat from the sun.',
-      'Transpiration is water vapour released by plants through their leaves.',
-      'Condensation happens when water vapour cools and forms tiny droplets, which gather as clouds.',
-      'Precipitation is water falling back to the ground as rain, snow, sleet or hail.',
-      'Collection is when water gathers in rivers, lakes, oceans and underground as groundwater.',
-    ].join(' '),
+    label: 'Sample notes: photosynthesis',
+    text: sampleNotes.trim(),
   },
 ]
 

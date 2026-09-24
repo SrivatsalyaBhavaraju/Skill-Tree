@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useReducer, useState } from 'react'
+import { useCallback, useEffect, useMemo, useReducer, useState } from 'react'
 import { Backdrop } from './components/Backdrop'
 import { ChaosPanel } from './components/ChaosPanel'
 import { ErrorBoundary } from './components/ErrorBoundary'
@@ -13,6 +13,7 @@ import { useGenerateTree } from './hooks/useGenerateTree'
 import { pickBackground } from './lib/background'
 import type { ChaosScenario } from './lib/chaos'
 import { missedCardIds, reviewDeck, topicDeck } from './lib/deck'
+import { checkGrounding } from './lib/grounding'
 import { isNotes } from './lib/input'
 import { progressReducer } from './lib/progress'
 import { isComplete, statusText, topicStatus } from './lib/tree'
@@ -36,6 +37,7 @@ function App() {
   }, [background])
 
   const clearNotice = useCallback(() => setNotice(null), [])
+  const grounding = useMemo(() => (tree && isNotes(tree.input) ? checkGrounding(tree.tree, tree.input) : null), [tree])
   const deck = openDeck()
 
   function openDeck() {
@@ -124,6 +126,7 @@ function App() {
               fromNotes={isNotes(tree.input)}
               report={tree.report}
               repaired={tree.repaired}
+              grounding={grounding}
               onOpenTopic={openTopic}
               onReview={openReview}
             />
@@ -162,7 +165,14 @@ function App() {
 
       {deck && (
         <ErrorBoundary onReset={startOver}>
-          <TopicPanel key={deck.id} deck={deck} progress={progress} onAnswer={answer} onClose={() => setOpened(null)} />
+          <TopicPanel
+            key={deck.id}
+            deck={deck}
+            progress={progress}
+            grounding={grounding}
+            onAnswer={answer}
+            onClose={() => setOpened(null)}
+          />
         </ErrorBoundary>
       )}
       <Toast notice={notice} onDone={clearNotice} />

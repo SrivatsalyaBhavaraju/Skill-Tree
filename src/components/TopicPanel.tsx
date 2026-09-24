@@ -1,15 +1,18 @@
 import { useEffect, useId, useRef, useState, type KeyboardEvent as ReactKeyboardEvent } from 'react'
 import { isCorrect, type Answer } from '../lib/progress'
 import type { Deck } from '../lib/deck'
+import type { Grounding } from '../lib/grounding'
 import type { Card } from '../lib/schema'
 import type { Progress } from '../lib/tree'
 import { Choices } from './Choices'
 import { Flashcard } from './Flashcard'
+import { Source } from './Source'
 import './TopicPanel.css'
 
 type Props = {
   deck: Deck
   progress: Progress
+  grounding: Record<string, Grounding> | null
   onAnswer: (cardId: string, correct: boolean) => void
   onClose: () => void
 }
@@ -45,7 +48,7 @@ function keyHint(card: Card): string {
   return 'Space flip · 1 missed · 2 got it · ← → move · Esc close'
 }
 
-export function TopicPanel({ deck, progress, onAnswer, onClose }: Props) {
+export function TopicPanel({ deck, progress, grounding, onAnswer, onClose }: Props) {
   const titleId = useId()
   const panel = useRef<HTMLDivElement>(null)
   const [index, setIndex] = useState(0)
@@ -194,6 +197,9 @@ export function TopicPanel({ deck, progress, onAnswer, onClose }: Props) {
               explanation={card.explanation}
               onPick={(position) => choose(position === 0)}
             />
+          )}
+          {grounding && (
+            <Source quote={card.source} grounding={grounding[card.id]} revealed={answer !== undefined || flipped} />
           )}
         </div>
 

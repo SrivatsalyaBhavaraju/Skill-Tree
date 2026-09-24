@@ -465,3 +465,60 @@
     transform: translateY(100%);
   }
 }
+
+.source {
+  margin-top: 0.9rem;
+}
+
+.source__badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.2rem 0.6rem;
+  font-size: 0.78rem;
+  font-weight: 600;
+  color: var(--review);
+  background: color-mix(in srgb, var(--review) 14%, transparent);
+  border: 1px solid color-mix(in srgb, var(--review) 50%, transparent);
+  border-radius: 99px;
+}
+
+.source__badge::before {
+  content: '!';
+  display: grid;
+  place-items: center;
+  width: 14px;
+  height: 14px;
+  font-size: 0.65rem;
+  color: var(--bg);
+  background: var(--review);
+  border-radius: 50%;
+}
+
+.source__quote {
+  margin: 0.6rem 0 0;
+  padding: 0.55rem 0.8rem;
+  font-size: 0.88rem;
+  font-style: italic;
+  color: var(--muted);
+  border-left: 2px solid var(--done);
+  animation: stage-in 0.5s var(--ease) both;
+}
+
+.source--flagged .source__quote {
+  border-left-color: var(--review);
+}
+
+.source__label {
+  display: block;
+  margin-bottom: 0.15rem;
+  font-size: 0.72rem;
+  font-style: normal;
+  font-weight: 600;
+}
+
+.source__missing {
+  margin: 0.45rem 0 0;
+  font-size: 0.82rem;
+  color: var(--muted);
+}

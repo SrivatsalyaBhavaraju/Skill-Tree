@@ -16,6 +16,10 @@ describe('receiptLine', () => {
     })
   })
 
+  it('counts quotes that were not found in the notes', () => {
+    expect(receiptLine({ fixed: [], dropped: [] }, false, 2).text).toBe('Repaired · 2 not found in your notes')
+  })
+
   it('treats a retry alone as a repair', () => {
     expect(receiptLine({ fixed: [], dropped: [] }, true).text).toBe('Repaired · 1 automatic retry')
   })
