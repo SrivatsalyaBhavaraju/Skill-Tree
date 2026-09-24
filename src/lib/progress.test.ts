@@ -70,6 +70,10 @@ describe('progressReducer', () => {
     expect(fixed).toEqual({ 'a#1': 'correct' })
   })
 
+  it('forgets one card, for example after it was replaced', () => {
+    expect(progressReducer({ 'a#1': 'missed', 'a#2': 'correct' }, { type: 'forget', cardId: 'a#1' })).toEqual({ 'a#2': 'correct' })
+  })
+
   it('resets to no progress', () => {
     expect(progressReducer({ 'a#1': 'correct' }, { type: 'reset' })).toEqual({})
   })

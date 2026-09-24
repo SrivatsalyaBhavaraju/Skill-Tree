@@ -3,6 +3,9 @@
     "api/generate.ts": {
       "maxDuration": 30,
       "includeFiles": "fixtures/**"
+    },
+    "api/fix-card.ts": {
+      "maxDuration": 30
     }
   }
 }

@@ -18,7 +18,7 @@ export type ParseResult = { ok: true; data: unknown; fixed: string[] } | Failure
 
 export type ValidationResult = { ok: true; tree: SkillTree; report: RepairReport } | Failure
 
-type CardDraft = CardContent & { source?: string }
+export type CardDraft = CardContent & { source?: string }
 
 type TopicDraft = Omit<TopicNode, 'cards'> & { cards: CardDraft[] }
 
@@ -311,6 +311,14 @@ function breakCycles(topics: TopicDraft[], report: RepairReport): void {
   for (const topic of [...topics].reverse()) {
     if (!state.has(topic.id)) visit(topic)
   }
+}
+
+export type CardCheck = { ok: true; card: CardDraft } | { ok: false; reason: string }
+
+export function validateCard(data: unknown): CardCheck {
+  const report: RepairReport = { fixed: [], dropped: [] }
+  const card = readCard(data, 'Card', report)
+  return card ? { ok: true, card } : { ok: false, reason: report.dropped[0] ?? 'Card: not a valid card' }
 }
 
 export function validateTree(data: unknown): ValidationResult {

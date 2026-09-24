@@ -1,4 +1,4 @@
-import type { TopicNode } from './schema'
+import type { Card, SkillTree, TopicNode } from './schema'
 
 export type CardResult = 'correct' | 'missed' | 'confident_miss'
 
@@ -91,5 +91,17 @@ export function summarize(nodes: TopicNode[], progress: Progress) {
     cards: sum('total'),
     correct: sum('correct'),
     missed: sum('missed'),
+  }
+}
+
+export function applyFixes(tree: SkillTree, fixes: Record<string, Card>): SkillTree {
+  if (Object.keys(fixes).length === 0) return tree
+
+  return {
+    ...tree,
+    nodes: tree.nodes.map((node) => ({
+      ...node,
+      cards: node.cards.map((card) => fixes[card.id] ?? card),
+    })),
   }
 }

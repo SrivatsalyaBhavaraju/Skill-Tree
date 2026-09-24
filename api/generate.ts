@@ -1,31 +1,10 @@
 import { isChaosScenario, type ChaosScenario } from '../src/lib/chaos'
-import type { ErrorKind } from '../src/lib/errors'
 import { checkInput } from '../src/lib/input'
 import { readModelOutput } from '../src/lib/validate'
 import { chaosModel } from './chaos'
 import { callGemini } from './gemini'
 import { buildPrompt, buildRepairPrompt, type Prompt } from './prompt'
-
-const STATUS: Record<ErrorKind, number> = {
-  bad_input: 400,
-  config: 500,
-  network: 502,
-  rate_limit: 429,
-  busy: 503,
-  upstream: 502,
-  empty: 502,
-  malformed: 502,
-  wrong_shape: 502,
-  server: 500,
-  cancelled: 499,
-  timeout: 504,
-}
-
-const MODEL_TIMEOUT_MS = 25_000
-
-function errorResponse(kind: ErrorKind, message: string): Response {
-  return Response.json({ error: { kind, message } }, { status: STATUS[kind] })
-}
+import { errorResponse, MODEL_TIMEOUT_MS } from './respond'
 
 async function readBody(request: Request): Promise<{ text: string; chaos: ChaosScenario } | null> {
   try {

@@ -7,6 +7,7 @@ export type Confidence = 'guess' | 'fair' | 'certain'
 
 export type ProgressAction =
   | { type: 'answer'; cardId: string; correct: boolean; confidence?: Confidence }
+  | { type: 'forget'; cardId: string }
   | { type: 'reset' }
 
 export function isCorrect(card: Card, answer: Answer): boolean {
@@ -28,6 +29,12 @@ export function progressReducer(state: Progress, action: ProgressAction): Progre
       if (action.correct) return { ...state, [action.cardId]: 'correct' }
       const confident = action.confidence === 'certain' || previous === 'confident_miss'
       return { ...state, [action.cardId]: confident ? 'confident_miss' : 'missed' }
+    }
+    case 'forget': {
+      if (!(action.cardId in state)) return state
+      const next = { ...state }
+      delete next[action.cardId]
+      return next
     }
     case 'reset':
       return {}

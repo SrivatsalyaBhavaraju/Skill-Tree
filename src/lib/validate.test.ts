@@ -1,6 +1,6 @@
 import { readFileSync } from 'node:fs'
 import { describe, expect, it } from 'vitest'
-import { readModelOutput, validateTree, type ValidationResult } from './validate'
+import { readModelOutput, validateCard, validateTree, type ValidationResult } from './validate'
 
 function fixture(name: string): string {
   return readFileSync(new URL(`../../fixtures/${name}`, import.meta.url), 'utf8')
@@ -74,6 +74,25 @@ describe('outputs that cannot be used', () => {
       expect(validateTree(junk).ok).toBe(false)
     },
   )
+})
+
+describe('validateCard', () => {
+  it('accepts and cleans a single good card', () => {
+    const result = validateCard({ type: 'mcq', question: ' Q ', options: ['a', 'b', 'b'], answerIndex: 1, explanation: 'E', source: 'S' })
+
+    expect(result).toEqual({
+      ok: true,
+      card: { type: 'mcq', question: 'Q', options: ['a', 'b'], answerIndex: 1, explanation: 'E', source: 'S' },
+    })
+  })
+
+  it('explains why a card was rejected', () => {
+    expect(validateCard({ type: 'truefalse', statement: 'S', answer: 'maybe' })).toEqual({
+      ok: false,
+      reason: 'Card: true/false answer is not true or false',
+    })
+    expect(validateCard(null)).toEqual({ ok: false, reason: 'Card: not a valid card' })
+  })
 })
 
 describe('salvaging broken output', () => {

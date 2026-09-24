@@ -1,11 +1,13 @@
 import type { ChaosScenario } from './chaos'
 import { isErrorKind, type ErrorKind } from './errors'
-import type { SkillTree } from './schema'
-import { isRecord, validateTree, type RepairReport } from './validate'
+import type { Card, SkillTree } from './schema'
+import { isRecord, validateCard, validateTree, type CardDraft, type RepairReport } from './validate'
 
-export type GenerateResult =
-  | { ok: true; tree: SkillTree; report: RepairReport; repaired: boolean }
-  | { ok: false; kind: ErrorKind; message: string }
+type Failure = { ok: false; kind: ErrorKind; message: string }
+
+export type GenerateResult = { ok: true; tree: SkillTree; report: RepairReport; repaired: boolean } | Failure
+
+export type FixResult = { ok: true; card: CardDraft } | Failure
 
 function strings(value: unknown): string[] {
   return Array.isArray(value) ? value.filter((item): item is string => typeof item === 'string') : []
@@ -15,7 +17,7 @@ function readReport(value: unknown): RepairReport {
   return isRecord(value) ? { fixed: strings(value.fixed), dropped: strings(value.dropped) } : { fixed: [], dropped: [] }
 }
 
-function readError(body: unknown, status: number): GenerateResult {
+function readError(body: unknown, status: number): Failure {
   const error = isRecord(body) ? body.error : undefined
 
   if (isRecord(error) && isErrorKind(error.kind) && typeof error.message === 'string') {
@@ -24,15 +26,15 @@ function readError(body: unknown, status: number): GenerateResult {
   return { ok: false, kind: 'server', message: `The server returned an error (${status}).` }
 }
 
-const CANCELLED: GenerateResult = { ok: false, kind: 'cancelled', message: 'The request was cancelled.' }
+const CANCELLED: Failure = { ok: false, kind: 'cancelled', message: 'The request was cancelled.' }
 
-export async function requestTree(text: string, signal?: AbortSignal, chaos?: ChaosScenario): Promise<GenerateResult> {
+async function postJson(url: string, payload: unknown, signal?: AbortSignal): Promise<{ ok: true; body: unknown } | Failure> {
   let response: Response
   try {
-    response = await fetch('/api/generate', {
+    response = await fetch(url, {
       method: 'POST',
       headers: { 'content-type': 'application/json' },
-      body: JSON.stringify(chaos && chaos !== 'normal' ? { text, chaos } : { text }),
+      body: JSON.stringify(payload),
       signal,
     })
   } catch {
@@ -48,9 +50,13 @@ export async function requestTree(text: string, signal?: AbortSignal, chaos?: Ch
     return { ok: false, kind: 'server', message: `The server sent a response we could not read (${response.status}).` }
   }
 
-  if (!response.ok) {
-    return readError(body, response.status)
-  }
+  return response.ok ? { ok: true, body } : readError(body, response.status)
+}
+
+export async function requestTree(text: string, signal?: AbortSignal, chaos?: ChaosScenario): Promise<GenerateResult> {
+  const posted = await postJson('/api/generate', chaos && chaos !== 'normal' ? { text, chaos } : { text }, signal)
+  if (!posted.ok) return posted
+  const { body } = posted
 
   const result = validateTree(isRecord(body) ? body.tree : undefined)
   if (!result.ok) {
@@ -67,4 +73,19 @@ export async function requestTree(text: string, signal?: AbortSignal, chaos?: Ch
       dropped: [...serverReport.dropped, ...result.report.dropped],
     },
   }
+}
+
+export async function requestCardFix(
+  topic: { label: string; summary: string },
+  card: Card,
+  notes: string | null,
+  signal?: AbortSignal,
+): Promise<FixResult> {
+  const payload = { topic: topic.label, summary: topic.summary, card, ...(notes ? { notes } : {}) }
+
+  const posted = await postJson('/api/fix-card', payload, signal)
+  if (!posted.ok) return posted
+
+  const checked = validateCard(isRecord(posted.body) ? posted.body.card : undefined)
+  return checked.ok ? { ok: true, card: checked.card } : { ok: false, kind: 'wrong_shape', message: checked.reason }
 }

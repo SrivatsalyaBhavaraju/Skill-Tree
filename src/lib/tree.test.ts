@@ -1,7 +1,7 @@
 import { readFileSync } from 'node:fs'
 import { describe, expect, it } from 'vitest'
 import type { TopicNode } from './schema'
-import { levelsOf, nextTopic, statusText, summarize, topicStatus, type Progress } from './tree'
+import { applyFixes, levelsOf, nextTopic, statusText, summarize, topicStatus, type Progress } from './tree'
 import { readModelOutput } from './validate'
 
 function photosynthesis(): TopicNode[] {
@@ -114,5 +114,22 @@ describe('nextTopic and summarize', () => {
       correct: 2,
       missed: 1,
     })
+  })
+})
+
+describe('applyFixes', () => {
+  const tree = { title: 'T', subject: 'theory' as const, nodes: [topic('a'), topic('b')] }
+
+  it('replaces only the fixed card and keeps everything else', () => {
+    const fixed = { id: 'b#2', type: 'flashcard' as const, front: 'New Q', back: 'New A' }
+    const result = applyFixes(tree, { 'b#2': fixed })
+
+    expect(result.nodes[1].cards[1]).toBe(fixed)
+    expect(result.nodes[1].cards[0]).toBe(tree.nodes[1].cards[0])
+    expect(result.nodes[0].cards).toEqual(tree.nodes[0].cards)
+  })
+
+  it('returns the same tree when there is nothing to fix', () => {
+    expect(applyFixes(tree, {})).toBe(tree)
   })
 })

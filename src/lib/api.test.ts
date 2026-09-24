@@ -1,6 +1,6 @@
 import { readFileSync } from 'node:fs'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
-import { requestTree } from './api'
+import { requestCardFix, requestTree } from './api'
 import { readModelOutput } from './validate'
 
 function validServerTree() {
@@ -123,4 +123,26 @@ describe('requestTree', () => {
 
     expect(!result.ok && result.kind).toBe('network')
   })
+
+  describe('requestCardFix', () => {
+    const card = { id: 'a#1', type: 'flashcard' as const, front: 'Q', back: 'Old answer' }
+
+    it('returns the re-validated replacement card', async () => {
+      fetchMock.mockResolvedValue(Response.json({ card: { type: 'flashcard', front: 'Q', back: 'New answer' } }))
+
+      const result = await requestCardFix({ label: 'A', summary: '' }, card, 'some notes')
+
+      expect(result).toEqual({ ok: true, card: { type: 'flashcard', front: 'Q', back: 'New answer' } })
+      expect(JSON.parse(String(fetchMock.mock.calls[0][1]?.body))).toMatchObject({ topic: 'A', notes: 'some notes' })
+    })
+
+    it('does not trust a broken card from the server', async () => {
+      fetchMock.mockResolvedValue(Response.json({ card: { type: 'flashcard', front: '' } }))
+
+      const result = await requestCardFix({ label: 'A', summary: '' }, card, null)
+
+      expect(!result.ok && result.kind).toBe('wrong_shape')
+    })
+  })
 })
+

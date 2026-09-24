@@ -594,3 +594,38 @@
 .panel__dot--confident_miss {
   background: var(--danger);
 }
+
+.panel__card-tools {
+  display: flex;
+  justify-content: flex-end;
+  margin-bottom: 0.4rem;
+}
+
+.panel__fix {
+  padding: 0.2rem 0;
+  font-size: 0.8rem;
+  color: var(--muted);
+  background: none;
+  border: 0;
+  text-decoration: underline;
+  text-decoration-color: var(--hair-strong);
+  text-underline-offset: 3px;
+  cursor: pointer;
+}
+
+.panel__fix:hover:not(:disabled) {
+  color: var(--text);
+}
+
+.panel__fix:disabled {
+  cursor: progress;
+}
+
+.panel__stage--fixing > :not(.panel__card-tools) {
+  opacity: 0.35;
+  filter: blur(2px);
+  pointer-events: none;
+  transition:
+    opacity 0.4s,
+    filter 0.4s;
+}

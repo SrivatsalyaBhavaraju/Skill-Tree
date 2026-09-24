@@ -15,6 +15,7 @@ type Props = {
   progress: Progress
   grounding: Record<string, Grounding> | null
   onAnswer: (cardId: string, correct: boolean, confidence: Confidence | undefined) => void
+  onFix: (cardId: string) => Promise<boolean>
   onClose: () => void
 }
 
@@ -24,6 +25,12 @@ const TRUE_FALSE = [
   { label: 'True', key: 'T' },
   { label: 'False', key: 'F' },
 ]
+
+function without<T>(record: Record<string, T>, key: string): Record<string, T> {
+  const next = { ...record }
+  delete next[key]
+  return next
+}
 
 function keyToAnswer(card: Card, key: string, flipped: boolean): Answer | null {
   const lower = key.toLowerCase()
@@ -49,7 +56,7 @@ function keyHint(card: Card): string {
   return 'Space flip · 1 missed · 2 got it · ← → move · Esc close'
 }
 
-export function TopicPanel({ deck, progress, grounding, onAnswer, onClose }: Props) {
+export function TopicPanel({ deck, progress, grounding, onAnswer, onFix, onClose }: Props) {
   const titleId = useId()
   const panel = useRef<HTMLDivElement>(null)
   const [index, setIndex] = useState(0)
@@ -57,6 +64,8 @@ export function TopicPanel({ deck, progress, grounding, onAnswer, onClose }: Pro
   const [answers, setAnswers] = useState<Record<string, Answer>>({})
   const [confidence, setConfidence] = useState<Record<string, Confidence>>({})
   const [closing, setClosing] = useState(false)
+  const [fixing, setFixing] = useState<string | null>(null)
+  const mounted = useRef(true)
 
   const card = deck.cards[index]
   const answer = answers[card.id]
@@ -78,6 +87,18 @@ export function TopicPanel({ deck, progress, grounding, onAnswer, onClose }: Pro
     else setClosing(true)
   }
 
+  async function fix() {
+    const cardId = card.id
+    setFixing(cardId)
+    const replaced = await onFix(cardId)
+    if (!mounted.current) return
+    setFixing(null)
+    if (!replaced) return
+    setFlipped(false)
+    setAnswers((current) => without(current, cardId))
+    setConfidence((current) => without(current, cardId))
+  }
+
   function choose(value: Answer) {
     if (answers[card.id] !== undefined) return
     setAnswers((current) => ({ ...current, [card.id]: value }))
@@ -89,8 +110,10 @@ export function TopicPanel({ deck, progress, grounding, onAnswer, onClose }: Pro
     const scroll = document.body.style.overflow
     document.body.style.overflow = 'hidden'
     panel.current?.focus()
+    mounted.current = true
 
     return () => {
+      mounted.current = false
       document.body.style.overflow = scroll
       opener?.focus()
     }
@@ -174,7 +197,12 @@ export function TopicPanel({ deck, progress, grounding, onAnswer, onClose }: Pro
           ))}
         </div>
 
-        <div className="panel__stage" key={card.id}>
+        <div className={fixing === card.id ? 'panel__stage panel__stage--fixing' : 'panel__stage'} key={card.id}>
+          <div className="panel__card-tools">
+            <button type="button" className="panel__fix" onClick={fix} disabled={fixing !== null}>
+              {fixing === card.id ? 'Rewriting this card…' : 'Card looks wrong? Fix it'}
+            </button>
+          </div>
           {askSureness && (
             <ConfidencePicker value={sureness} onChange={(value) => setConfidence((current) => ({ ...current, [card.id]: value }))} />
           )}
