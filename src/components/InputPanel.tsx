@@ -11,14 +11,24 @@ type Props = {
 
 const WARN_AT = MAX_INPUT_CHARS * 0.9
 
-function modeHint(value: string): string {
+function ModeHint({ value }: { value: string }) {
   if (value.trim() === '') {
-    return 'Paste notes to get cards quoted from your own text, or type a topic for cards from general knowledge.'
+    return <>Paste notes to get cards quoted from your own text, or type a topic.</>
   }
   if (isNotes(value)) {
-    return 'Notes mode: every card quotes your notes, and each quote is checked against them.'
+    return (
+      <>
+        <span className="input-panel__mode input-panel__mode--notes">Notes</span>
+        Every card will quote your notes, and each quote gets checked.
+      </>
+    )
   }
-  return 'Topic mode: cards come from general knowledge, so there are no quotes to check.'
+  return (
+    <>
+      <span className="input-panel__mode input-panel__mode--topic">Topic</span>
+      Cards come from general knowledge.
+    </>
+  )
 }
 
 export function InputPanel({ value, onChange, onSubmit, busy }: Props) {
@@ -46,7 +56,7 @@ export function InputPanel({ value, onChange, onSubmit, busy }: Props) {
   return (
     <form className="input-panel" onSubmit={handleSubmit}>
       <label className="input-panel__label" htmlFor={id}>
-        Notes or topic
+        Your notes or a topic
       </label>
       <textarea
         id={id}
@@ -54,24 +64,24 @@ export function InputPanel({ value, onChange, onSubmit, busy }: Props) {
         value={value}
         onChange={(event) => onChange(event.target.value)}
         onKeyDown={handleKeyDown}
-        rows={8}
-        placeholder="Paste lecture notes, or type a topic like “How vaccines work”"
+        rows={6}
+        placeholder="Paste lecture notes, or type something like “How vaccines work”"
         aria-describedby={`${id}-hint`}
         spellCheck
       />
 
       <div className="input-panel__footer">
         <p id={`${id}-hint`} className="input-panel__hint">
-          {modeHint(value)}
+          <ModeHint value={value} />
         </p>
 
         <div className="input-panel__actions">
           <span className={length > WARN_AT ? 'input-panel__count input-panel__count--warn' : 'input-panel__count'}>
             {length.toLocaleString('en-US')} / {MAX_INPUT_CHARS.toLocaleString('en-US')}
           </span>
-          <button type="submit" className="input-panel__submit" disabled={!canSubmit}>
-            {busy ? 'Building…' : 'Build tree'}
-            <kbd className="input-panel__kbd">Ctrl ↵</kbd>
+          <button type="submit" className="btn btn--primary" disabled={!canSubmit}>
+            {busy ? 'Building…' : 'Build my tree'}
+            <span className="input-panel__kbd">Ctrl ↵</span>
           </button>
         </div>
       </div>
