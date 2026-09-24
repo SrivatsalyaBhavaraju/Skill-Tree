@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useReducer, useState } from 'react'
 import { Backdrop } from './components/Backdrop'
+import { ChaosPanel } from './components/ChaosPanel'
 import { ErrorBoundary } from './components/ErrorBoundary'
 import { ErrorCard } from './components/ErrorCard'
 import { Examples } from './components/Examples'
@@ -10,10 +11,13 @@ import { TopicPanel } from './components/TopicPanel'
 import { TreeView } from './components/TreeView'
 import { useGenerateTree } from './hooks/useGenerateTree'
 import { pickBackground } from './lib/background'
+import type { ChaosScenario } from './lib/chaos'
 import { missedCardIds, reviewDeck, topicDeck } from './lib/deck'
 import { isNotes } from './lib/input'
 import { progressReducer } from './lib/progress'
 import { isComplete, statusText, topicStatus } from './lib/tree'
+
+const CHAOS_ENABLED = new URLSearchParams(window.location.search).has('chaos')
 
 function App() {
   const [text, setText] = useState('')
@@ -21,6 +25,7 @@ function App() {
   const [opened, setOpened] = useState<{ topic: string } | { review: string[] } | null>(null)
   const [notice, setNotice] = useState<Notice | null>(null)
   const [progress, dispatch] = useReducer(progressReducer, {})
+  const [chaos, setChaos] = useState<ChaosScenario>('normal')
   const { state, generate, cancel } = useGenerateTree()
 
   const tree = state.status === 'success' && !editing ? state : null
@@ -44,7 +49,7 @@ function App() {
     setEditing(false)
     setOpened(null)
     dispatch({ type: 'reset' })
-    generate(input)
+    generate(input, CHAOS_ENABLED ? chaos : undefined)
   }
 
   function startOver() {
@@ -161,6 +166,7 @@ function App() {
         </ErrorBoundary>
       )}
       <Toast notice={notice} onDone={clearNotice} />
+      {CHAOS_ENABLED && <ChaosPanel value={chaos} onChange={setChaos} />}
     </>
   )
 }

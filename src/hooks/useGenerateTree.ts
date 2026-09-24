@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react'
+import type { ChaosScenario } from '../lib/chaos'
 import type { ErrorKind } from '../lib/errors'
 import { createRequester } from '../lib/requester'
 import type { SkillTree } from '../lib/schema'
@@ -16,10 +17,10 @@ export function useGenerateTree() {
 
   useEffect(() => () => requester.cancel(), [requester])
 
-  async function generate(text: string) {
+  async function generate(text: string, chaos?: ChaosScenario) {
     setState({ status: 'loading', input: text })
 
-    const outcome = await requester.run(text)
+    const outcome = await requester.run(text, chaos)
     if (outcome.stale) return
 
     const { result } = outcome

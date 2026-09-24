@@ -1,6 +1,7 @@
 import { requestTree, type GenerateResult } from './api'
+import type { ChaosScenario } from './chaos'
 
-type Request = (text: string, signal: AbortSignal) => Promise<GenerateResult>
+type Request = (text: string, signal: AbortSignal, chaos?: ChaosScenario) => Promise<GenerateResult>
 
 export type Outcome = { stale: true } | { stale: false; result: GenerateResult }
 
@@ -17,7 +18,7 @@ export function createRequester(request: Request = requestTree, timeoutMs = REQU
   let latest = 0
 
   return {
-    async run(text: string): Promise<Outcome> {
+    async run(text: string, chaos?: ChaosScenario): Promise<Outcome> {
       controller?.abort()
       const own = new AbortController()
       controller = own
@@ -30,7 +31,7 @@ export function createRequester(request: Request = requestTree, timeoutMs = REQU
       }, timeoutMs)
 
       try {
-        const result = await request(text, own.signal)
+        const result = await request(text, own.signal, chaos)
         if (id !== latest) return { stale: true }
         return { stale: false, result: timedOut ? TIMED_OUT : result }
       } finally {

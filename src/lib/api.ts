@@ -1,3 +1,4 @@
+import type { ChaosScenario } from './chaos'
 import { isErrorKind, type ErrorKind } from './errors'
 import type { SkillTree } from './schema'
 import { isRecord, validateTree, type RepairReport } from './validate'
@@ -25,13 +26,13 @@ function readError(body: unknown, status: number): GenerateResult {
 
 const CANCELLED: GenerateResult = { ok: false, kind: 'cancelled', message: 'The request was cancelled.' }
 
-export async function requestTree(text: string, signal?: AbortSignal): Promise<GenerateResult> {
+export async function requestTree(text: string, signal?: AbortSignal, chaos?: ChaosScenario): Promise<GenerateResult> {
   let response: Response
   try {
     response = await fetch('/api/generate', {
       method: 'POST',
       headers: { 'content-type': 'application/json' },
-      body: JSON.stringify({ text }),
+      body: JSON.stringify(chaos && chaos !== 'normal' ? { text, chaos } : { text }),
       signal,
     })
   } catch {

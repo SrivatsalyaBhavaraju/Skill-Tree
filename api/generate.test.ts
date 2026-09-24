@@ -202,4 +202,64 @@ describe('POST /api/generate', () => {
       expect(body.error.kind).toBe('empty')
     })
   })
+
+  describe('Chaos Mode', () => {
+    const chaos = (scenario: string) => send(JSON.stringify({ text: 'Photosynthesis', chaos: scenario }))
+
+    it('salvages the partially broken fixture without calling the model', async () => {
+      const { status, body } = await chaos('partial')
+
+      expect(status).toBe(200)
+      expect(body.report.dropped).toHaveLength(2)
+      expect(fetchMock).not.toHaveBeenCalled()
+    })
+
+    it('shows the repair retry fixing an unusable first answer', async () => {
+      const { status, body } = await chaos('repair')
+
+      expect(status).toBe(200)
+      expect(body.repaired).toBe(true)
+    })
+
+    it.each([
+      ['malformed', 502, 'malformed'],
+      ['wrong_shape', 502, 'wrong_shape'],
+      ['empty', 502, 'empty'],
+      ['busy', 503, 'busy'],
+      ['server_error', 500, 'server'],
+    ])('%s fails with a %i %s', async (scenario, status, kind) => {
+      const response = await chaos(scenario)
+
+      expect(response.status).toBe(status)
+      expect(response.body.error.kind).toBe(kind)
+      expect(fetchMock).not.toHaveBeenCalled()
+    })
+
+    it('answers slowly but correctly', async () => {
+      vi.useFakeTimers()
+
+      const pending = chaos('slow')
+      await vi.advanceTimersByTimeAsync(8000)
+      const { status } = await pending
+
+      expect(status).toBe(200)
+    })
+
+    it('works without an API key', async () => {
+      delete process.env.GEMINI_API_KEY
+
+      const { status } = await chaos('partial')
+
+      expect(status).toBe(200)
+    })
+
+    it('ignores an unknown scenario and calls the real model', async () => {
+      fetchMock.mockResolvedValue(geminiReply(fixture('valid-tree.json')))
+
+      const { status } = await chaos('meteor-strike')
+
+      expect(status).toBe(200)
+      expect(fetchMock).toHaveBeenCalledTimes(1)
+    })
+  })
 })

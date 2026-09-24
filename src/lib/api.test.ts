@@ -32,6 +32,16 @@ describe('requestTree', () => {
     expect(JSON.parse(String(init?.body))).toEqual({ text: 'Photosynthesis' })
   })
 
+  it('sends a chaos scenario only when one is picked', async () => {
+    fetchMock.mockImplementation(async () => Response.json({ tree: validServerTree(), report: {} }))
+
+    await requestTree('Photosynthesis', undefined, 'partial')
+    await requestTree('Photosynthesis', undefined, 'normal')
+
+    expect(JSON.parse(String(fetchMock.mock.calls[0][1]?.body))).toEqual({ text: 'Photosynthesis', chaos: 'partial' })
+    expect(JSON.parse(String(fetchMock.mock.calls[1][1]?.body))).toEqual({ text: 'Photosynthesis' })
+  })
+
   it('returns the re-validated tree with the server report', async () => {
     const report = { fixed: ['"A": removed a link to itself'], dropped: [] }
     fetchMock.mockResolvedValue(Response.json({ tree: validServerTree(), report }))
