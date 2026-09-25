@@ -42,7 +42,7 @@
 .error-card__details {
   margin-top: 0.7rem;
   font-size: 0.8rem;
-  color: var(--faint);
+  color: var(--muted);
 }
 
 .error-card__details summary {

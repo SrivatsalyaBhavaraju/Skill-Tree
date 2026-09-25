@@ -167,9 +167,14 @@ function App() {
             Skill Tree
           </div>
           {tree && (
-            <button type="button" className="btn" onClick={() => setEditing(true)}>
-              New tree
-            </button>
+            <div className="app__tools">
+              <p className="app__keys">
+                <kbd>1–4</kbd> answer <kbd>Space</kbd> flip <kbd>← →</kbd> move <kbd>Esc</kbd> close
+              </p>
+              <button type="button" className="btn" onClick={() => setEditing(true)}>
+                New tree
+              </button>
+            </div>
           )}
         </header>
 

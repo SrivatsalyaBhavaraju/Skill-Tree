@@ -52,9 +52,9 @@
   --text: #1b2130;
   --muted: #626a7a;
   --faint: #b3b6bd;
-  --done: #1e9a5a;
+  --done: #157a46;
   --ready: #1f68cf;
-  --review: #c27400;
+  --review: #9e5d00;
   --locked: #9ea2aa;
   --danger: #c23b3b;
   --doodle: rgba(40, 46, 60, 0.13);
@@ -118,6 +118,33 @@ textarea {
 .app__wordmark svg {
   width: 22px;
   height: 22px;
+}
+
+.app__tools {
+  display: flex;
+  align-items: center;
+  gap: 1.5rem;
+}
+
+.app__keys {
+  margin: 0;
+  font-size: 0.8rem;
+  color: var(--muted);
+}
+
+.app__keys kbd {
+  margin: 0 0.2rem 0 0.6rem;
+  padding: 0.05rem 0.4rem;
+  font-family: inherit;
+  font-size: 0.75rem;
+  color: var(--text);
+  border: 1px solid var(--hair-strong);
+  border-bottom-width: 2px;
+  border-radius: 5px;
+}
+
+.app__keys kbd:first-child {
+  margin-left: 0;
 }
 
 .app__hero {
@@ -217,6 +244,10 @@ textarea {
 
   .app__hero {
     margin: 2.75rem 0 1.75rem;
+  }
+
+  .app__keys {
+    display: none;
   }
 }
 

@@ -36,7 +36,7 @@
 }
 
 .input-panel__field::placeholder {
-  color: var(--faint);
+  color: var(--muted);
 }
 
 .input-panel__footer {
@@ -88,7 +88,7 @@
 .input-panel__count {
   font-size: 0.8rem;
   font-variant-numeric: tabular-nums;
-  color: var(--faint);
+  color: var(--muted);
 }
 
 .input-panel__count--warn {

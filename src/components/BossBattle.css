@@ -71,7 +71,7 @@
 .boss__note {
   margin: 1rem 0 0;
   font-size: 0.85rem;
-  color: var(--faint);
+  color: var(--muted);
 }
 
 .boss__start {

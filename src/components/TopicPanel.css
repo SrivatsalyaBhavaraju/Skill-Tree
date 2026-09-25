@@ -178,7 +178,7 @@
 
 .flashcard__hint {
   font-size: 0.8rem;
-  color: var(--faint);
+  color: var(--muted);
 }
 
 .question {
@@ -377,7 +377,7 @@
   margin: 0.9rem 0 0;
   font-size: 0.78rem;
   text-align: center;
-  color: var(--faint);
+  color: var(--muted);
 }
 
 @keyframes panel-in {
@@ -543,7 +543,8 @@
 }
 
 .confidence__option {
-  padding: 0.3rem 0.7rem;
+  min-height: 36px;
+  padding: 0.3rem 0.8rem;
   font-size: 0.82rem;
   font-weight: 500;
   background: transparent;
@@ -602,6 +603,7 @@
 }
 
 .panel__fix {
+  min-height: 32px;
   padding: 0.2rem 0;
   font-size: 0.8rem;
   color: var(--muted);
