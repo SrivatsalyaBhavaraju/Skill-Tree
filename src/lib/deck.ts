@@ -1,5 +1,5 @@
-import type { Card, TopicNode } from './schema'
-import { isMiss, type Progress } from './tree'
+import type { Card, TopicNode } from './schema.js'
+import { isMiss, type Progress } from './tree.js'
 
 export type Deck = {
   id: string

@@ -1,4 +1,4 @@
-import type { RepairReport } from './validate'
+import type { RepairReport } from './validate.js'
 
 export const CHECKS = [
   'Valid JSON',

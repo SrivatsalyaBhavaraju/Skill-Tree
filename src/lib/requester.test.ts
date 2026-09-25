@@ -1,6 +1,6 @@
 import { afterEach, describe, expect, it, vi } from 'vitest'
-import type { GenerateResult } from './api'
-import { createRequester } from './requester'
+import type { GenerateResult } from './api.js'
+import { createRequester } from './requester.js'
 
 const CANCELLED: GenerateResult = { ok: false, kind: 'cancelled', message: 'cancelled' }
 

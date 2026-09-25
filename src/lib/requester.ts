@@ -1,5 +1,5 @@
-import { requestTree, type GenerateResult } from './api'
-import type { ChaosScenario } from './chaos'
+import { requestTree, type GenerateResult } from './api.js'
+import type { ChaosScenario } from './chaos.js'
 
 type Request = (text: string, signal: AbortSignal, chaos?: ChaosScenario) => Promise<GenerateResult>
 

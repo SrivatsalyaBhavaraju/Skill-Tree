@@ -1,4 +1,4 @@
-import type { ErrorKind } from '../src/lib/errors'
+import type { ErrorKind } from '../src/lib/errors.js'
 
 const STATUS: Record<ErrorKind, number> = {
   bad_input: 400,

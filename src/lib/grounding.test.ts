@@ -1,7 +1,7 @@
 import { readFileSync } from 'node:fs'
 import { describe, expect, it } from 'vitest'
-import { checkGrounding, groundingSummary, isGrounded } from './grounding'
-import { readModelOutput } from './validate'
+import { checkGrounding, groundingSummary, isGrounded } from './grounding.js'
+import { readModelOutput } from './validate.js'
 
 function fixture(name: string): string {
   return readFileSync(new URL(`../../fixtures/${name}`, import.meta.url), 'utf8')

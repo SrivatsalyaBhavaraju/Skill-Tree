@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
-import { bossQuestions, formatTime, passMark } from './boss'
-import type { Card, TopicNode } from './schema'
+import { bossQuestions, formatTime, passMark } from './boss.js'
+import type { Card, TopicNode } from './schema.js'
 
 function mcq(id: string): Card {
   return { id, type: 'mcq', question: id, options: ['a', 'b', 'c'], answerIndex: 0, explanation: '' }

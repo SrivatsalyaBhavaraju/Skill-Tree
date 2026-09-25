@@ -1,6 +1,6 @@
 import { readFileSync } from 'node:fs'
-import type { ChaosScenario } from '../src/lib/chaos'
-import type { GeminiResult } from './gemini'
+import type { ChaosScenario } from '../src/lib/chaos.js'
+import type { GeminiResult } from './gemini.js'
 
 const SLOW_MS = 8000
 

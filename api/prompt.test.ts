@@ -1,6 +1,6 @@
 import { readFileSync } from 'node:fs'
 import { describe, expect, it } from 'vitest'
-import { buildPrompt, buildRepairPrompt } from './prompt'
+import { buildPrompt, buildRepairPrompt } from './prompt.js'
 
 const notes = readFileSync(new URL('../fixtures/notes-photosynthesis.txt', import.meta.url), 'utf8')
 

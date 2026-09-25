@@ -1,5 +1,5 @@
-import { isNotes } from '../src/lib/input'
-import { LIMITS } from '../src/lib/schema'
+import { isNotes } from '../src/lib/input.js'
+import { LIMITS } from '../src/lib/schema.js'
 
 export type Prompt = {
   system: string

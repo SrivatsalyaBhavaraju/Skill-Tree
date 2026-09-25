@@ -1,6 +1,6 @@
 import { readFileSync } from 'node:fs'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
-import { POST } from './generate'
+import { POST } from './generate.js'
 
 function fixture(name: string): string {
   return readFileSync(new URL(`../fixtures/${name}`, import.meta.url), 'utf8')

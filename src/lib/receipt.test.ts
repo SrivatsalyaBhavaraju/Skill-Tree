@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { receiptLine } from './receipt'
+import { receiptLine } from './receipt.js'
 
 describe('receiptLine', () => {
   it('calls a result with nothing to report clean', () => {

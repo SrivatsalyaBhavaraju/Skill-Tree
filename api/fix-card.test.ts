@@ -1,5 +1,5 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
-import { POST } from './fix-card'
+import { POST } from './fix-card.js'
 
 const CARD = { type: 'truefalse', statement: 'The Calvin cycle needs light directly.', answer: true, explanation: 'Wrong on purpose.' }
 

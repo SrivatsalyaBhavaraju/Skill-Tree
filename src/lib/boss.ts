@@ -1,4 +1,4 @@
-import type { Card, TopicNode } from './schema'
+import type { Card, TopicNode } from './schema.js'
 
 export const BOSS_QUESTIONS = 10
 export const SECONDS_PER_QUESTION = 20

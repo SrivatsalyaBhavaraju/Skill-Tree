@@ -1,5 +1,5 @@
-import { isNotes } from './input'
-import type { Subject } from './schema'
+import { isNotes } from './input.js'
+import type { Subject } from './schema.js'
 
 export const BACKGROUNDS = ['chalk', 'graph', 'notebook'] as const
 

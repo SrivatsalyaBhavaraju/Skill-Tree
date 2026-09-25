@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
-import { missedCardIds, reviewDeck, topicDeck } from './deck'
-import type { TopicNode } from './schema'
+import { missedCardIds, reviewDeck, topicDeck } from './deck.js'
+import type { TopicNode } from './schema.js'
 
 function topic(id: string, cards: number): TopicNode {
   return {

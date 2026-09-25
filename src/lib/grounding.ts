@@ -1,4 +1,4 @@
-import type { SkillTree } from './schema'
+import type { SkillTree } from './schema.js'
 
 export type Grounding = 'found' | 'not_found' | 'no_quote'
 

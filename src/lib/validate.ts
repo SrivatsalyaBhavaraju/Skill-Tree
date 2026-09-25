@@ -1,4 +1,4 @@
-import { LIMITS, SUBJECTS, type CardContent, type SkillTree, type Subject, type TopicNode } from './schema'
+import { LIMITS, SUBJECTS, type CardContent, type SkillTree, type Subject, type TopicNode } from './schema.js'
 
 export type FailureKind = 'empty' | 'malformed' | 'wrong_shape'
 

@@ -1,8 +1,8 @@
 import { readFileSync } from 'node:fs'
 import { describe, expect, it } from 'vitest'
-import type { TopicNode } from './schema'
-import { applyFixes, levelsOf, nextTopic, statusText, summarize, topicStatus, type Progress } from './tree'
-import { readModelOutput } from './validate'
+import type { TopicNode } from './schema.js'
+import { applyFixes, levelsOf, nextTopic, statusText, summarize, topicStatus, type Progress } from './tree.js'
+import { readModelOutput } from './validate.js'
 
 function photosynthesis(): TopicNode[] {
   const result = readModelOutput(readFileSync(new URL('../../fixtures/valid-tree.json', import.meta.url), 'utf8'))

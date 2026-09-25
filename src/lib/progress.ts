@@ -1,5 +1,5 @@
-import type { Card } from './schema'
-import type { Progress } from './tree'
+import type { Card } from './schema.js'
+import type { Progress } from './tree.js'
 
 export type Answer = number | boolean
 

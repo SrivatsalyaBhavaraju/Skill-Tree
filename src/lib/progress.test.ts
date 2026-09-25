@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
-import { isCorrect, progressReducer } from './progress'
-import type { Card } from './schema'
+import { isCorrect, progressReducer } from './progress.js'
+import type { Card } from './schema.js'
 
 const mcq: Card = { id: 'a#1', type: 'mcq', question: 'Q', options: ['x', 'y', 'z'], answerIndex: 1, explanation: '' }
 const truefalse: Card = { id: 'a#2', type: 'truefalse', statement: 'S', answer: false, explanation: '' }

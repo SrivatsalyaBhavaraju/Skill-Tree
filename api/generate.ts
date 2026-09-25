@@ -1,10 +1,10 @@
-import { isChaosScenario, type ChaosScenario } from '../src/lib/chaos'
-import { checkInput } from '../src/lib/input'
-import { readModelOutput } from '../src/lib/validate'
-import { chaosModel } from './chaos'
-import { callGemini } from './gemini'
-import { buildPrompt, buildRepairPrompt, type Prompt } from './prompt'
-import { errorResponse, MODEL_TIMEOUT_MS } from './respond'
+import { isChaosScenario, type ChaosScenario } from '../src/lib/chaos.js'
+import { checkInput } from '../src/lib/input.js'
+import { readModelOutput } from '../src/lib/validate.js'
+import { chaosModel } from './chaos.js'
+import { callGemini } from './gemini.js'
+import { buildPrompt, buildRepairPrompt, type Prompt } from './prompt.js'
+import { errorResponse, MODEL_TIMEOUT_MS } from './respond.js'
 
 async function readBody(request: Request): Promise<{ text: string; chaos: ChaosScenario } | null> {
   try {

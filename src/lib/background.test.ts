@@ -1,6 +1,6 @@
 import { readFileSync } from 'node:fs'
 import { describe, expect, it } from 'vitest'
-import { pickBackground } from './background'
+import { pickBackground } from './background.js'
 
 const notes = readFileSync(new URL('../../fixtures/notes-photosynthesis.txt', import.meta.url), 'utf8')
 

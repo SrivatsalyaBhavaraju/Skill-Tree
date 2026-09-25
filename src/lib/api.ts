@@ -1,7 +1,7 @@
-import type { ChaosScenario } from './chaos'
-import { isErrorKind, type ErrorKind } from './errors'
-import type { Card, SkillTree } from './schema'
-import { isRecord, validateCard, validateTree, type CardDraft, type RepairReport } from './validate'
+import type { ChaosScenario } from './chaos.js'
+import { isErrorKind, type ErrorKind } from './errors.js'
+import type { Card, SkillTree } from './schema.js'
+import { isRecord, validateCard, validateTree, type CardDraft, type RepairReport } from './validate.js'
 
 type Failure = { ok: false; kind: ErrorKind; message: string }
 

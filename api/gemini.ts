@@ -1,4 +1,4 @@
-import type { Prompt } from './prompt'
+import type { Prompt } from './prompt.js'
 
 const ENDPOINT = 'https://generativelanguage.googleapis.com/v1beta/models'
 const DEFAULT_MODEL = 'gemini-3.5-flash-lite'

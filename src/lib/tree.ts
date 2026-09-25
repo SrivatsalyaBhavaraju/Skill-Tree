@@ -1,4 +1,4 @@
-import type { Card, SkillTree, TopicNode } from './schema'
+import type { Card, SkillTree, TopicNode } from './schema.js'
 
 export type CardResult = 'correct' | 'missed' | 'confident_miss'
 

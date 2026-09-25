@@ -1,4 +1,4 @@
-import { LIMITS } from './schema'
+import { LIMITS } from './schema.js'
 
 export const MAX_INPUT_CHARS = 20000
 

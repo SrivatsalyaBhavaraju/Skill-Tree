@@ -1,6 +1,6 @@
 import { readFileSync } from 'node:fs'
 import { describe, expect, it } from 'vitest'
-import { readModelOutput, validateCard, validateTree, type ValidationResult } from './validate'
+import { readModelOutput, validateCard, validateTree, type ValidationResult } from './validate.js'
 
 function fixture(name: string): string {
   return readFileSync(new URL(`../../fixtures/${name}`, import.meta.url), 'utf8')

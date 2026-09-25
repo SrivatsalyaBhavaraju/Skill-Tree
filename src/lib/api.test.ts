@@ -1,7 +1,7 @@
 import { readFileSync } from 'node:fs'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
-import { requestCardFix, requestTree } from './api'
-import { readModelOutput } from './validate'
+import { requestCardFix, requestTree } from './api.js'
+import { readModelOutput } from './validate.js'
 
 function validServerTree() {
   const result = readModelOutput(readFileSync(new URL('../../fixtures/valid-tree.json', import.meta.url), 'utf8'))

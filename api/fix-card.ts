@@ -1,8 +1,8 @@
-import { checkInput } from '../src/lib/input'
-import { isRecord, parseModelText, validateCard } from '../src/lib/validate'
-import { callGemini } from './gemini'
-import { buildFixPrompt } from './prompt'
-import { errorResponse, MODEL_TIMEOUT_MS } from './respond'
+import { checkInput } from '../src/lib/input.js'
+import { isRecord, parseModelText, validateCard } from '../src/lib/validate.js'
+import { callGemini } from './gemini.js'
+import { buildFixPrompt } from './prompt.js'
+import { errorResponse, MODEL_TIMEOUT_MS } from './respond.js'
 
 type FixRequest = {
   topic: string

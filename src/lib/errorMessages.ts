@@ -1,4 +1,4 @@
-import type { ErrorKind } from './errors'
+import type { ErrorKind } from './errors.js'
 
 export type ErrorCopy = {
   title: string
