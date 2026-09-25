@@ -2,7 +2,7 @@
 
 Paste your notes or name a topic, and study it as a skill tree. Each concept is a topic with flashcards, multiple-choice and true/false cards. You unlock a topic by mastering the topics it builds on.
 
-**Live:** _add the Vercel link here_ · **Failure demo:** add `?chaos` to the URL
+**Live:** https://skill-tree-ten-beryl.vercel.app · **Failure demo:** https://skill-tree-ten-beryl.vercel.app/?chaos · **Health check:** [/api/health](https://skill-tree-ten-beryl.vercel.app/api/health)
 
 > **Screenshot / GIF:** _add here_
 
@@ -29,7 +29,7 @@ npm start                 # http://localhost:5173
 | `GEMINI_API_KEY` | yes | Only ever read on the server. It never has a `VITE_` prefix, so Vite cannot put it in the browser bundle |
 | `GEMINI_MODEL` | no | Defaults to `gemini-3.5-flash-lite` |
 
-Deploying: import the repo in Vercel (framework preset **Vite**) and add `GEMINI_API_KEY` in the project settings. `vercel.json` raises the function time limit to 30 s and bundles `fixtures/` for Chaos Mode.
+Deploying: import the repo in Vercel (framework preset **Vite**), add `GEMINI_API_KEY` in the project settings, and redeploy after changing it. `vercel.json` raises the function time limit to 30 s and bundles `fixtures/` for Chaos Mode. `/api/health` reports whether the key is configured (`set`, `empty` or `missing`) without revealing it.
 
 ---
 
